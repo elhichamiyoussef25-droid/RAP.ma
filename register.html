@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>إنشاء حساب</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth">
+
+<form class="auth-box" onsubmit="register(event)">
+    <h2>إنشاء حساب</h2>
+
+    <input id="regUser" type="text" placeholder="اسم المستخدم" required>
+    <input id="regEmail" type="email" placeholder="البريد الإلكتروني" required>
+    <input id="regPass" type="password" placeholder="كلمة المرور" required>
+
+    <button type="submit">إنشاء الحساب</button>
+
+    <p>
+        لديك حساب؟
+        <a href="login.html">تسجيل الدخول</a>
+    </p>
+</form>
+
+<script>
+function register(e) {
+    e.preventDefault();
+
+    const account = {
+        user: regUser.value,
+        email: regEmail.value,
+        pass: regPass.value
+    };
+
+    localStorage.setItem("account", JSON.stringify(account));
+    alert("تم إنشاء الحساب بنجاح");
+
+    window.location.href = "login.html";
+}
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الألعاب | Games Hub</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        if (localStorage.getItem("loggedIn") !== "true") {
+            window.location.href = "index.html";
+        }
+        
+        // Demo user data
+        const user = JSON.parse(localStorage.getItem("account")) || {
+            user: "Player",
+            email: "player@example.com"
+        };
+        
+        // Update last login
+        localStorage.setItem("lastLogin", new Date().toISOString());
+        
+        // Game statistics
+        const gameStats = {
+            shadowDuel: { plays: 1247, rating: 4.5 },
+            temp: { plays: 856, rating: 4.3 },
+            leiun: { plays: 342, rating: 4.7 }
+        };
+
+// أضف في home.html بعد تسجيل الدخول
+// تحميل النقاط المعلقة
+const pendingPoints = JSON.parse(localStorage.getItem('pendingPoints') || '[]');
+if (pendingPoints.length > 0) {
+    let total = 0;
+    pendingPoints.forEach(p => total += p.amount);
+    
+    if (confirm(`لديك ${total} نقطة من الألعاب السابقة. هل تريد إضافتها؟`)) {
+        pointsSystem.addPoints(total, 'pending');
+        localStorage.removeItem('pendingPoints');
+    }
+}
+
+    </script>
+</head>
+<body class="home">
+
+<header>
+    <div class="user-profile">
+        <div class="user-info">
+            <span>مرحباً، <strong id="username">${user.user}</strong></span>
+            <small id="userEmail">${user.email}</small>
+        </div>
+        <button class="logout-btn" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i>
+            تسجيل الخروج
+        </button>
+    </div>
+    
+    <h1><i class="fas fa-gamepad"></i> اختر لعبتك المفضلة</h1>
+    <p class="subtitle">العب مع أصدقائك في نفس الجهاز - لا حاجة لاتصال إنترنت!</p>
+</header>
+
+<section class="games-grid">
+
+    <!-- Shadow Duel - اللعبة الأصلية -->
+    <div class="game-card featured">
+        <span class="game-badge hot">الأكثر لعباً</span>
+        <h3><i class="fas fa-crosshairs"></i> Shadow Duel</h3>
+        <div class="players">
+            <i class="fas fa-user-friends"></i>
+            <span>لاعبين 2</span>
+        </div>
+        <p class="description">لعبة تمويه واختبار: قناص ضد لاعب خفي. تحكم بالماوس أو الأسهم!</p>
+        <div class="game-meta">
+            <span class="rating">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star-half-alt"></i>
+                4.5
+            </span>
+            <span class="duration">
+                <i class="fas fa-clock"></i>
+                60 ثانية
+            </span>
+        </div>
+        <a href="games/jourdeep.html" class="play-btn">
+            <i class="fas fa-play"></i>
+            ابدأ اللعب
+        </a>
+    </div>
+
+    <!-- TEMP - لعبة التوقيت بالمفاتيح -->
+    <div class="game-card">
+        <span class="game-badge new">جديد</span>
+        <h3><i class="fas fa-hourglass-half"></i> TEMP</h3>
+        <div class="players">
+            <i class="fas fa-user-friends"></i>
+            <span>لاعبين 4</span>
+        </div>
+        <p class="description">لعبة توقيت مثيرة! أوقف المؤقت عند الرقم المطلوب باستخدام المفاتيح.</p>
+        <div class="game-meta">
+            <span class="rating">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="far fa-star"></i>
+                4.3
+            </span>
+            <span class="duration">
+                <i class="fas fa-keyboard"></i>
+                مفاتيح: A P L X
+            </span>
+        </div>
+        <a href="games/temps.html" class="play-btn">
+            <i class="fas fa-play"></i>
+            ابدأ اللعب
+        </a>
+    </div>
+
+    <!-- LEIUN - لعبة جديدة -->
+    <div class="game-card">
+        <span class="game-badge new">جديد</span>
+        <h3><i class="fas fa-brain"></i> LEIUN</h3>
+        <div class="players">
+            <i class="fas fa-user-friends"></i>
+            <span>لاعبين 2-4</span>
+        </div>
+        <p class="description">تحدي ذهني سريع! أول من يجد الحل يفوز. تحدي عقلي مشوق.</p>
+        <div class="game-meta">
+            <span class="rating">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                4.7
+            </span>
+            <span class="duration">
+                <i class="fas fa-bolt"></i>
+                سريع
+            </span>
+        </div>
+        <a href="games/leiun.html" class="play-btn">
+            <i class="fas fa-play"></i>
+            ابدأ اللعب
+        </a>
+    </div>
+
+    <!-- Coming Soon Games -->
+    <div class="game-card">
+        <h3><i class="fas fa-flag-checkered"></i> Race Game</h3>
+        <div class="players">
+            <i class="fas fa-user-friends"></i>
+            <span>لاعبين 4</span>
+        </div>
+        <p class="description">سباق سيارات محموم مع إطارات وأسلحة! تحكم بالأسهم والأزرار.</p>
+        <div class="game-meta">
+            <span class="rating">قريباً</span>
+        </div>
+        <button class="coming-soon" disabled>
+            <i class="fas fa-hourglass-half"></i>
+            قريباً
+        </button>
+    </div>
+
+    <div class="game-card">
+        <h3><i class="fas fa-futbol"></i> Soccer Duel</h3>
+        <div class="players">
+            <i class="fas fa-user-friends"></i>
+            <span>لاعبين 2</span>
+        </div>
+        <p class="description">كرة قدم سريعة على طاولة صغيرة. أول من يسجل 10 أهداف يفوز!</p>
+        <div class="game-meta">
+            <span class="rating">قريباً</span>
+        </div>
+        <button class="coming-soon" disabled>
+            <i class="fas fa-hourglass-half"></i>
+            قريباً
+        </button>
+    </div>
+
+    <div class="game-card">
+        <h3><i class="fas fa-chess"></i> Strategy War</h3>
+        <div class="players">
+            <i class="fas fa-user-friends"></i>
+            <span>لاعبين 2</span>
+        </div>
+        <p class="description">لعبة استراتيجية تناوب الأدوار. خطط واهزم خصمك!</p>
+        <div class="game-meta">
+            <span class="rating">قريباً</span>
+        </div>
+        <button class="coming-soon" disabled>
+            <i class="fas fa-hourglass-half"></i>
+            قريباً
+        </button>
+    </div>
+
+</section>
+
+<div class="quick-stats">
+    <div class="stat-card">
+        <i class="fas fa-history"></i>
+        <div>
+            <h4>آخر دخول</h4>
+            <p id="lastLogin">الآن</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <i class="fas fa-gamepad"></i>
+        <div>
+            <h4>الألعاب المتاحة</h4>
+            <p>3 ألعاب</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <i class="fas fa-fire"></i>
+        <div>
+            <h4>الأكثر نشاطاً</h4>
+            <p>Shadow Duel</p>
+        </div>
+    </div>
+</div>
+
+<!-- زر الانتقال إلى صفحة taw.html -->
+<div style="text-align: center; margin: 40px 0;">
+    <a href="taw.html" class="nav-button button-2" style="display: inline-block; padding: 15px 30px; background: linear-gradient(to right, #3498db, #2980b9); color: white; text-decoration: none; border-radius: 8px; margin: 10px; text-align: center; min-width: 200px;">
+        <div class="icon">
+            <i class="fas fa-file-alt"></i>
+        </div>
+        <h2>صفحة Taw</h2>
+        <p>انتقل إلى صفحة Taw للاطلاع على محتوى خاص</p>
+    </a>
+    
+    <!-- زر الانتقال إلى صفحة wat.html -->
+    <a href="proj/wat.html" class="nav-button button-3" style="display: inline-block; padding: 15px 30px; background: linear-gradient(to right, #2ecc71, #27ae60); color: white; text-decoration: none; border-radius: 8px; margin: 10px; text-align: center; min-width: 200px;">
+        <div class="icon">
+            <i class="fas fa-file-invoice"></i>
+        </div>
+        <h2>صفحة Wat</h2>
+        <p>انتقل إلى صفحة Wat للتعرف على المزيد من التفاصيل</p>
+    </a>
+</div>
+
+<footer class="home-footer">
+    <p>© 2024 Local Party Games. جميع الحقوق محفوظة.</p>
+    <div class="social-links">
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-discord"></i></a>
+        <a href="#"><i class="fas fa-envelope"></i></a>
+    </div>
+</footer>
+
+<style>
+    .user-profile {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        right: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 25px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .user-info {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    #username {
+        font-size: 1.2rem;
+        color: var(--primary);
+    }
+    
+    #userEmail {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+    
+    .logout-btn {
+        background: linear-gradient(135deg, var(--danger), #ff4757);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s;
+    }
+    
+    .logout-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(255,107,107,0.3);
+    }
+    
+    .subtitle {
+        color: var(--text-muted);
+        margin-top: 10px;
+        font-size: 1.1rem;
+    }
+    
+    .game-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        z-index: 2;
+    }
+    
+    .game-badge.hot {
+        background: linear-gradient(135deg, var(--danger), #ff4757);
+    }
+    
+    .game-badge.new {
+        background: linear-gradient(135deg, var(--secondary), #3a9b7a);
+    }
+    
+    .game-card {
+        background: var(--bg-glass);
+        backdrop-filter: var(--blur);
+        border: 1px solid var(--border-glass);
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        position: relative;
+        overflow: hidden;
+        min-height: 280px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    
+    .game-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+    }
+    
+    .game-card.featured {
+        border: 2px solid var(--primary);
+        transform: scale(1.05);
+    }
+    
+    .game-card h3 {
+        margin-bottom: 15px;
+        font-size: 1.6rem;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .players {
+        color: var(--text-muted);
+        margin-bottom: 10px;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+    }
+    
+    .description {
+        color: var(--text-muted);
+        margin-bottom: 20px;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        flex-grow: 1;
+    }
+    
+    .game-meta {
+        display: flex;
+        justify-content: space-between;
+        margin: 15px 0;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+    
+    .rating, .duration {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .rating i {
+        color: gold;
+    }
+    
+    .play-btn, .coming-soon {
+        padding: 12px 25px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-width: 140px;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+    
+    .play-btn {
+        background: linear-gradient(135deg, var(--primary), #4db8ff);
+        color: #000;
+    }
+    
+    .play-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(110,231,255,0.3);
+        background: linear-gradient(135deg, #4db8ff, var(--primary));
+    }
+    
+    .coming-soon {
+        background: linear-gradient(135deg, var(--accent), #9966ff);
+        color: #000;
+        cursor: not-allowed;
+        opacity: 0.8;
+    }
+    
+    .game-card:hover {
+        transform: translateY(-12px) scale(1.03);
+        box-shadow: 0 35px 70px rgba(0,0,0,0.8);
+        border-color: var(--primary);
+    }
+    
+    .game-card.featured:hover {
+        transform: translateY(-12px) scale(1.08);
+    }
+    
+    .quick-stats {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin: 40px auto;
+        max-width: 1200px;
+        padding: 0 40px;
+        flex-wrap: wrap;
+    }
+    
+    .stat-card {
+        flex: 1;
+        min-width: 200px;
+        background: var(--bg-glass);
+        backdrop-filter: var(--blur);
+        border: 1px solid var(--border-glass);
+        border-radius: 16px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        transition: all 0.3s;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary);
+    }
+    
+    .stat-card i {
+        font-size: 2rem;
+        color: var(--primary);
+    }
+    
+    .stat-card h4 {
+        margin: 0;
+        font-size: 1rem;
+        color: var(--text-muted);
+    }
+    
+    .stat-card p {
+        margin: 5px 0 0;
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+    
+    .home-footer {
+        text-align: center;
+        padding: 30px;
+        color: var(--text-muted);
+        border-top: 1px solid rgba(255,255,255,0.1);
+        margin-top: 40px;
+    }
+    
+    .social-links {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 15px;
+    }
+    
+    .social-links a {
+        color: var(--text-muted);
+        font-size: 1.2rem;
+        transition: all 0.3s;
+    }
+    
+    .social-links a:hover {
+        color: var(--primary);
+        transform: translateY(-3px);
+    }
+    
+    @media (max-width: 768px) {
+        .user-profile {
+            position: relative;
+            top: 0;
+            left: 0;
+            right: 0;
+            margin: 20px;
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+        }
+        
+        .game-card.featured {
+            transform: none;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-8px);
+        }
+        
+        .game-card.featured:hover {
+            transform: translateY(-8px);
+        }
+        
+        .quick-stats {
+            flex-direction: column;
+        }
+        
+        .games-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .game-card {
+            min-height: auto;
+        }
+        
+        .play-btn, .coming-soon {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+        }
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+    }
+    
+    .container {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        text-align: center;
+        max-width: 500px;
+        width: 100%;
+    }
+    
+    h1 {
+        color: #333;
+        margin-bottom: 30px;
+    }
+    
+    .buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 20px;
+    }
+    
+    .btn {
+        display: block;
+        padding: 15px 25px;
+        text-decoration: none;
+        color: white;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: bold;
+        transition: all 0.3s;
+        text-align: center;
+    }
+    
+    .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .btn-taw {
+        background: linear-gradient(to right, #3498db, #2980b9);
+    }
+    
+    .btn-wat {
+        background: linear-gradient(to right, #2ecc71, #27ae60);
+    }
+    
+    .btn-home {
+        background: linear-gradient(to right, #9b59b6, #8e44ad);
+        margin-top: 10px;
+    }
+    
+    .info {
+        margin-top: 30px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-right: 4px solid #3498db;
+    }
+    
+    @media (max-width: 600px) {
+        .container {
+            padding: 20px;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            font-size: 16px;
+        }
+    }
+
+    /* أنماط الأزرار الملاحية */
+    .nav-button {
+        display: inline-block;
+        padding: 20px;
+        margin: 10px;
+        background: var(--bg-glass);
+        backdrop-filter: var(--blur);
+        border: 1px solid var(--border-glass);
+        border-radius: 16px;
+        text-decoration: none;
+        color: var(--text-main);
+        transition: all 0.3s;
+        text-align: center;
+        min-width: 250px;
+    }
+    
+    .nav-button:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+    
+    .nav-button .icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        color: var(--primary);
+    }
+    
+    .nav-button h2 {
+        margin: 10px 0;
+        font-size: 1.3rem;
+    }
+    
+    .nav-button p {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    
+    .button-2 {
+        border-left: 4px solid #3498db;
+    }
+    
+    .button-3 {
+        border-left: 4px solid #2ecc71;
+    }
+</style>
+
+<script>
+    function logout() {
+        localStorage.removeItem("loggedIn");
+        window.location.href = "index.html";
+    }
+    
+    // Display last login time
+    const lastLogin = localStorage.getItem("lastLogin");
+    if (lastLogin) {
+        const date = new Date(lastLogin);
+        const now = new Date();
+        const diff = Math.floor((now - date) / 1000); // seconds
+        
+        let timeText;
+        if (diff < 60) {
+            timeText = "الآن";
+        } else if (diff < 3600) {
+            const minutes = Math.floor(diff / 60);
+            timeText = `قبل ${minutes} دقيقة`;
+        } else if (diff < 86400) {
+            const hours = Math.floor(diff / 3600);
+            timeText = `قبل ${hours} ساعة`;
+        } else {
+            const days = Math.floor(diff / 86400);
+            timeText = `قبل ${days} يوم`;
+        }
+        
+        document.getElementById('lastLogin').textContent = timeText;
+    }
+    
+    // Set username and email
+    document.getElementById('username').textContent = user.user;
+    document.getElementById('userEmail').textContent = user.email;
+    
+    // Update game play counts with animation
+    function animateCount(elementId, targetValue) {
+        const element = document.querySelector(elementId);
+        if (!element) return;
+        
+        const current = parseInt(element.textContent) || 0;
+        if (current >= targetValue) return;
+        
+        let count = current;
+        const increment = Math.ceil((targetValue - current) / 50);
+        
+        const timer = setInterval(() => {
+            count += increment;
+            if (count >= targetValue) {
+                count = targetValue;
+                clearInterval(timer);
+            }
+            element.textContent = count.toLocaleString();
+        }, 30);
+    }
+    
+    // Animate stats on page load
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            // Update play counts for games
+            const gameCards = document.querySelectorAll('.game-card');
+            gameCards.forEach((card, index) => {
+                const playCount = card.querySelector('.play-count');
+                if (playCount) {
+                    const games = ['shadowDuel', 'temp', 'leiun'];
+                    if (games[index]) {
+                        animateCount(`#playCount${index + 1}`, gameStats[games[index]].plays);
+                    }
+                }
+            });
+        }, 1000);
+    });
+
+    // توليد رقم متابعة عشوائي
+    function generateTrackingNumber() {
+        const prefix = 'GAME';
+        const timestamp = Date.now().toString().slice(-6);
+        const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+        return `${prefix}-${timestamp}-${random}`;
+    }
+
+    // توليد بريد إلكتروني للعرض التوضيحي
+    function generateDemoEmail() {
+        const domains = ['gmail.com', 'outlook.com', 'yahoo.com', 'hotmail.com'];
+        const randomDomain = domains[Math.floor(Math.random() * domains.length)];
+        return `localpartygames@${randomDomain}`;
+    }
+
+    // إعادة تعيين النموذج
+    function resetForm() {
+        if (confirm('هل تريد مسح جميع البيانات في النموذج؟')) {
+            document.getElementById('gameUploadForm').reset();
+        }
+    }
+
+    // فتح صفحة التتبع
+    function openTracking() {
+        const lastSubmission = JSON.parse(localStorage.getItem('lastSubmission'));
+        if (lastSubmission && lastSubmission.trackingNumber) {
+            document.getElementById('trackingNumber').value = lastSubmission.trackingNumber;
+            trackSubmission();
+        } else {
+            alert('لم تقم بإرسال أي طلبات بعد. أرسل طلبك أولاً.');
+        }
+    }
+
+    // تتبع الطلب
+    function trackSubmission() {
+        const trackingNumber = document.getElementById('trackingNumber').value.trim();
+        
+        if (!trackingNumber) {
+            alert('الرجاء إدخال رقم المتابعة');
+            return;
+        }
+        
+        // البحث عن الطلب في localStorage
+        const submissions = JSON.parse(localStorage.getItem('gameSubmissions') || '[]');
+        const submission = submissions.find(s => s.trackingNumber === trackingNumber);
+        
+        if (submission) {
+            showTrackingModal(submission);
+        } else {
+            alert('لم يتم العثور على طلب بهذا الرقم. تأكد من صحة رقم المتابعة.');
+        }
+    }
+
+    // إرسال الطلب (نظام حقيقي)
+    async function submitGameRequest(formData) {
+        // هذا نظام حقيقي للإرسال - يمكنك تعديله ليتوافق مع خادمك
+        
+        const trackingNumber = generateTrackingNumber();
+        const timestamp = new Date().toLocaleString('ar-SA');
+        
+        // حفظ في localStorage (للعرض التوضيحي)
+        const submission = {
+            ...formData,
+            trackingNumber,
+            timestamp,
+            status: 'submitted',
+            emailSent: false,
+            reviewStatus: 'pending'
+        };
+        
+        // حفظ الطلب
+        const submissions = JSON.parse(localStorage.getItem('gameSubmissions') || '[]');
+        submissions.push(submission);
+        localStorage.setItem('gameSubmissions', JSON.stringify(submissions));
+        localStorage.setItem('lastSubmission', JSON.stringify(submission));
+        
+        // محاكاة إرسال البريد الإلكتروني
+        const emailSent = await simulateEmailSending(formData, trackingNumber);
+        
+        return {
+            success: true,
+            trackingNumber,
+            emailSent,
+            timestamp,
+            submission
+        };
+    }
+
+    // محاكاة إرسال البريد الإلكتروني
+    async function simulateEmailSending(formData, trackingNumber) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                console.log('📧 إرسال بريد إلكتروني محاكاة إلى:', formData.developerEmail);
+                console.log('📧 نسخة إلى: localpartygames@email.com');
+                console.log('📧 رقم المتابعة:', trackingNumber);
+                resolve(true);
+            }, 1000);
+        });
+    }
+
+    // عرض نموذج النجاح
+    function showSuccessModal(trackingInfo) {
+        const trackingInfoHTML = `
+            <h4><i class="fas fa-barcode"></i> معلومات طلبك</h4>
+            
+            <div class="tracking-detail">
+                <span class="detail-label">رقم المتابعة:</span>
+                <span class="detail-value tracking-number">${trackingInfo.trackingNumber}</span>
+            </div>
+            
+            <div class="tracking-detail">
+                <span class="detail-label">اسم اللعبة:</span>
+                <span class="detail-value">${trackingInfo.gameName}</span>
+            </div>
+            
+            <div class="tracking-detail">
+                <span class="detail-label">المطور:</span>
+                <span class="detail-value">${trackingInfo.developerName}</span>
+            </div>
+            
+            <div class="tracking-detail">
+                <span class="detail-label">البريد الإلكتروني:</span>
+                <span class="detail-value">${trackingInfo.developerEmail}</span>
+            </div>
+            
+            <div class="tracking-detail">
+                <span class="detail-label">وقت الإرسال:</span>
+                <span class="detail-value">${trackingInfo.timestamp}</span>
+            </div>
+            
+            <div class="tracking-detail">
+                <span class="detail-label">حالة الطلب:</span>
+                <span class="detail-value" style="color: var(--primary); font-weight: bold;">تم الإرسال بنجاح ✓</span>
+            </div>
+            
+            <div class="email-notice" style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                <i class="fas fa-envelope"></i>
+                <small>تم إرسال نسخة إلى بريدك الإلكتروني</small>
+            </div>
+        `;
+        
+        document.getElementById('trackingInfo').innerHTML = trackingInfoHTML;
+        document.getElementById('successModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    // إغلاق نافذة النجاح
+    function closeSuccessModal() {
+        document.getElementById('successModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    // طباعة الطلب
+    function printSubmission() {
+        window.print();
+    }
+
+    // عرض نافذة تتبع الطلب
+    function showTrackingModal(submission) {
+        const statusSteps = [
+            {
+                id: 'submitted',
+                title: 'تم استلام الطلب',
+                description: 'تم استلام طلبك بنجاح وجاري معالجته',
+                date: submission.timestamp,
+                completed: true,
+                current: false
+            },
+            {
+                id: 'reviewing',
+                title: 'جاري المراجعة',
+                description: 'فريقنا يراجع اللعبة ويتأكد من عملها بشكل صحيح',
+                date: 'قريباً',
+                completed: submission.reviewStatus !== 'pending',
+                current: submission.reviewStatus === 'reviewing'
+            },
+            {
+                id: 'testing',
+                title: 'جاري الاختبار',
+                description: 'نختبر اللعبة على أجهزة ومتصفحات مختلفة',
+                date: 'قريباً',
+                completed: submission.reviewStatus === 'tested',
+                current: submission.reviewStatus === 'testing'
+            },
+            {
+                id: 'approved',
+                title: 'تمت الموافقة',
+                description: 'تمت الموافقة على اللعبة وسيتم إضافتها للموقع',
+                date: 'قريباً',
+                completed: submission.reviewStatus === 'approved',
+                current: submission.reviewStatus === 'approved'
+            },
+            {
+                id: 'published',
+                title: 'تم النشر',
+                description: 'اللعبة الآن متاحة للجميع على الموقع',
+                date: 'قريباً',
+                completed: submission.reviewStatus === 'published',
+                current: submission.reviewStatus === 'published'
+            }
+        ];
+        
+        let stepsHTML = '';
+        statusSteps.forEach(step => {
+            const stepClass = step.completed ? 'completed' : step.current ? 'current' : '';
+            stepsHTML += `
+                <div class="status-step ${stepClass}">
+                    <div class="status-icon">
+                        <i class="fas fa-${step.id === 'submitted' ? 'paper-plane' : step.id === 'reviewing' ? 'search' : step.id === 'testing' ? 'vial' : step.id === 'approved' ? 'check' : 'globe'}"></i>
+                    </div>
+                    <div class="status-content">
+                        <h4>${step.title}</h4>
+                        <p>${step.description}</p>
+                        <div class="status-date">${step.date}</div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        const trackingDetailsHTML = `
+            <div class="tracking-header">
+                <h4><i class="fas fa-gamepad"></i> ${submission.gameName}</h4>
+                <p>رقم المتابعة: <strong class="tracking-number">${submission.trackingNumber}</strong></p>
+            </div>
+            
+            <div class="tracking-info">
+                <div class="tracking-detail">
+                    <span class="detail-label">المطور:</span>
+                    <span class="detail-value">${submission.developerName}</span>
+                </div>
+                <div class="tracking-detail">
+                    <span class="detail-label">البريد الإلكتروني:</span>
+                    <span class="detail-value">${submission.developerEmail}</span>
+                </div>
+                <div class="tracking-detail">
+                    <span class="detail-label">وقت الإرسال:</span>
+                    <span class="detail-value">${submission.timestamp}</span>
+                </div>
+                <div class="tracking-detail">
+                    <span class="detail-label">حالة المراجعة:</span>
+                    <span class="detail-value" style="color: ${getStatusColor(submission.reviewStatus)}; font-weight: bold;">
+                        ${getStatusText(submission.reviewStatus)}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="status-timeline">
+                ${stepsHTML}
+            </div>
+            
+            <div class="contact-info" style="margin-top: 30px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+                <h5><i class="fas fa-question-circle"></i> لديك استفسار؟</h5>
+                <p style="margin: 10px 0; color: var(--text-muted);">تواصل معنا على: <strong>localpartygames@email.com</strong></p>
+                <small style="color: var(--text-muted); opacity: 0.8;">أو اذكر رقم المتابعة في أي استفسار</small>
+            </div>
+        `;
+        
+        document.getElementById('trackingDetails').innerHTML = trackingDetailsHTML;
+        document.getElementById('trackingModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    // إغلاق نافذة التتبع
+    function closeTrackingModal() {
+        document.getElementById('trackingModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    // مساعدات الحالة
+    function getStatusColor(status) {
+        const colors = {
+            'pending': '#ff9800',
+            'reviewing': '#2196f3',
+            'testing': '#9c27b0',
+            'approved': '#4caf50',
+            'published': '#4caf50',
+            'rejected': '#f44336'
+        };
+        return colors[status] || '#9e9e9e';
+    }
+
+    function getStatusText(status) {
+        const texts = {
+            'pending': 'في الانتظار',
+            'reviewing': 'جاري المراجعة',
+            'testing': 'جاري الاختبار',
+            'approved': 'تمت الموافقة',
+            'published': 'تم النشر',
+            'rejected': 'مرفوض'
+        };
+        return texts[status] || 'غير معروف';
+    }
+
+    // معالجة إرسال النموذج
+    if (document.getElementById('gameUploadForm')) {
+        document.getElementById('gameUploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // التحقق من التقنيات
+            const techCheckboxes = document.querySelectorAll('input[name="tech"]:checked');
+            if (techCheckboxes.length === 0) {
+                alert('الرجاء اختيار لغة برمجة واحدة على الأقل');
+                return;
+            }
+            
+            // جمع بيانات النموذج
+            const formData = {
+                gameName: document.getElementById('gameName').value,
+                developerName: document.getElementById('developerName').value,
+                developerEmail: document.getElementById('developerEmail').value,
+                gameDescription: document.getElementById('gameDescription').value,
+                gamePlayers: document.getElementById('gamePlayers').value,
+                gameLink: document.getElementById('gameLink').value,
+                gameScreenshot: document.getElementById('gameScreenshot').value,
+                aiHelp: document.getElementById('aiHelp').value,
+                technologies: Array.from(techCheckboxes).map(cb => cb.value)
+            };
+            
+            // إرسال الطلب
+            const submitBtn = this.querySelector('.btn-submit');
+            const originalText = submitBtn.innerHTML;
+            
+            try {
+                // تغيير نص الزر للإشارة إلى التحميل
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+                submitBtn.disabled = true;
+                
+                // إرسال الطلب
+                const result = await submitGameRequest(formData);
+                
+                if (result.success) {
+                    // إظهار نافذة النجاح
+                    showSuccessModal({
+                        ...formData,
+                        trackingNumber: result.trackingNumber,
+                        timestamp: result.timestamp
+                    });
+                    
+                    // إعادة تعيين النموذج
+                    this.reset();
+                }
+            } catch (error) {
+                console.error('فشل إرسال الطلب:', error);
+                alert('حدث خطأ أثناء إرسال الطلب. حاول مرة أخرى.');
+            } finally {
+                // إعادة الزر إلى حالته الأصلية
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    }
+
+    // إغلاق النوافذ عند النقر خارجها
+    document.addEventListener('click', function(e) {
+        if (e.target.id === 'successModal') closeSuccessModal();
+        if (e.target.id === 'trackingModal') closeTrackingModal();
+    });
+
+    // إغلاق بالضغط على Esc
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            if (document.getElementById('successModal') && document.getElementById('successModal').style.display === 'flex') closeSuccessModal();
+            if (document.getElementById('trackingModal') && document.getElementById('trackingModal').style.display === 'flex') closeTrackingModal();
+        }
+    });
+</script>
+
+<!-- إعلان -->
+<script src="https://pl27753557.effectivegatecpm.com/74/4d/15/744d15b33c06ca54b8ee71dee9b444e5.js"></script>
+
+</body>
+</html>

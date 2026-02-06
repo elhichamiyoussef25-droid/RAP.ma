@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DeepSeek Opener</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #startBtn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+        }
+        #stopBtn {
+            background: #f44336;
+            color: white;
+            border: none;
+        }
+        #status {
+            margin-top: 20px;
+            padding: 10px;
+            background: #e8f5e9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>فتح DeepSeek 10 مرات</h1>
+        
+        <div>
+            <label for="urlInput">الرابط:</label>
+            <input type="text" id="urlInput" value="https://chat.deepseek.com" 
+                   style="width: 300px; padding: 5px;">
+        </div>
+        
+        <div>
+            <label for="countInput">عدد المرات:</label>
+            <input type="number" id="countInput" value="10" min="1" max="50" 
+                   style="width: 60px; padding: 5px;">
+        </div>
+        
+        <div>
+            <button id="startBtn">ابدأ الفتح!</button>
+            <button id="stopBtn">إيقاف</button>
+        </div>
+        
+        <div id="status">
+            حالة: جاهز
+        </div>
+        
+        <div id="log"></div>
+    </div>
+
+    <script>
+        // المتغيرات
+        let count = 0;
+        let maxOpens = 10;
+        let intervalId;
+        let isRunning = false;
+        
+        // عناصر DOM
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const urlInput = document.getElementById('urlInput');
+        const countInput = document.getElementById('countInput');
+        const statusDiv = document.getElementById('status');
+        const logDiv = document.getElementById('log');
+        
+        // وظيفة تحديث الحالة
+        function updateStatus(message) {
+            statusDiv.innerHTML = `حالة: ${message}`;
+        }
+        
+        // وظيفة تسجيل الأحداث
+        function addLog(message) {
+            const p = document.createElement('p');
+            p.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logDiv.prepend(p);
+            
+            // حفظ فقط آخر 10 رسائل
+            const logs = logDiv.getElementsByTagName('p');
+            if (logs.length > 10) {
+                logDiv.removeChild(logs[logs.length - 1]);
+            }
+        }
+        
+        // وظيفة فتح الرابط
+        function openDeepSeek() {
+            if (isRunning) {
+                alert("العملية جارية بالفعل!");
+                return;
+            }
+            
+            // الحصول على القيم من المدخلات
+            const url = urlInput.value;
+            maxOpens = parseInt(countInput.value) || 10;
+            
+            // التحقق من الرابط
+            if (!url.startsWith('http')) {
+                alert("الرجاء إدخال رابط صحيح يبدأ بـ http أو https");
+                return;
+            }
+            
+            // إعادة الضبط
+            count = 0;
+            isRunning = true;
+            updateStatus("جاري التشغيل...");
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            addLog(`بدأ فتح ${url} ${maxOpens} مرات`);
+            
+            // البدء
+            intervalId = setInterval(() => {
+                if (count >= maxOpens) {
+                    clearInterval(intervalId);
+                    updateStatus("اكتمل!");
+                    addLog(`✅ تم فتح الرابط ${maxOpens} مرات`);
+                    isRunning = false;
+                    startBtn.disabled = false;
+                    stopBtn.disabled = true;
+                    return;
+                }
+                
+                try {
+                    // فتح الرابط في نافذة جديدة
+                    window.open(url, '_blank');
+                    count++;
+                    updateStatus(`جاري... (${count}/${maxOpens})`);
+                    addLog(`تم الفتح ${count}/${maxOpens}`);
+                } catch (error) {
+                    addLog(`❌ خطأ: ${error.message}`);
+                }
+            }, 2000); // كل 2 ثانية
+        }
+        
+        // وظيفة الإيقاف
+        function stopOpening() {
+            if (intervalId) {
+                clearInterval(intervalId);
+                updateStatus("تم الإيقاف");
+                addLog(`⏹️ تم إيقاف العملية بعد ${count} مرة`);
+                isRunning = false;
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+            }
+        }
+        
+        // إضافة المستمعين للأحداث
+        startBtn.addEventListener('click', openDeepSeek);
+        stopBtn.addEventListener('click', stopOpening);
+        
+        // التهيئة الأولية
+        stopBtn.disabled = true;
+        updateStatus("جاهز للبدء");
+        
+        // لمنع إغلاق النوافذ (اختياري)
+        window.onbeforeunload = function() {
+            if (isRunning) {
+                return "العملية لا تزال جارية. هل تريد المغادرة؟";
+            }
+        };
+    </script>
+</body>
+</html>

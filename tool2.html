@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أداة متقدمة: تحويل النص إلى كلام والكلام إلى نص</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --success: #2ec4b6;
+            --danger: #e71d36;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            color: var(--secondary);
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2 i {
+            font-size: 1.5rem;
+        }
+
+        .textarea-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            resize: vertical;
+            transition: border 0.3s;
+            line-height: 1.6;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .textarea-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            min-width: 140px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: scale(1.05);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #26a69a;
+            transform: scale(1.05);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c62828;
+            transform: scale(1.05);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: scale(1.05);
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+        }
+
+        .status-dot.active {
+            background: #28a745;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .voice-settings {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .setting-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .setting-item {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        select, input[type="range"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .volume-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .results {
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid var(--success);
+        }
+
+        .results h3 {
+            margin-bottom: 10px;
+            color: var(--success);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid #ddd;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .btn {
+                min-width: 120px;
+                padding: 10px 20px;
+            }
+            
+            .setting-group {
+                flex-direction: column;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .language-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .lang-btn {
+            padding: 8px 16px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .lang-btn.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-comment-alt"></i> أداة تحويل النص والكلام</h1>
+            <p class="subtitle">أداة متكاملة لتحويل النص إلى كلام والكلام إلى نص بدقة عالية</p>
+        </header>
+
+        <div class="language-selector">
+            <button class="lang-btn active" onclick="setLanguage('ar-SA')">
+                <i class="fas fa-language"></i> العربية
+            </button>
+            <button class="lang-btn" onclick="setLanguage('en-US')">
+                <i class="fas fa-language"></i> English
+            </button>
+            <button class="lang-btn" onclick="setLanguage('fr-FR')">
+                <i class="fas fa-language"></i> Français
+            </button>
+        </div>
+
+        <div class="card">
+            <h2><i class="fas fa-volume-up"></i> تحويل النص إلى كلام</h2>
+            
+            <div class="textarea-container">
+                <textarea id="textToSpeak" placeholder="اكتب النص هنا أو الصقه..."></textarea>
+                <div class="textarea-info">
+                    <span id="charCount">0 حرف</span>
+                    <span id="wordCount">0 كلمة</span>
+                </div>
+            </div>
+
+            <div class="voice-settings">
+                <h3><i class="fas fa-sliders-h"></i> إعدادات الصوت</h3>
+                <div class="setting-group">
+                    <div class="setting-item">
+                        <label><i class="fas fa-voice"></i> سرعة النطق</label>
+                        <input type="range" id="rate" min="0.5" max="2" step="0.1" value="1">
+                        <div class="volume-display">
+                            <span>بطيء</span>
+                            <span id="rateValue">1.0</span>
+                            <span>سريع</span>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label><i class="fas fa-volume-up"></i> درجة الصوت</label>
+                        <input type="range" id="pitch" min="0.5" max="2" step="0.1" value="1">
+                        <div class="volume-display">
+                            <span>منخفض</span>
+                            <span id="pitchValue">1.0</span>
+                            <span>مرتفع</span>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label><i class="fas fa-volume"></i> مستوى الصوت</label>
+                        <input type="range" id="volume" min="0" max="1" step="0.1" value="0.8">
+                        <div class="volume-display">
+                            <span>منخفض</span>
+                            <span id="volumeValue">0.8</span>
+                            <span>مرتفع</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-primary" onclick="speakText()">
+                    <i class="fas fa-play"></i> تشغيل النص
+                </button>
+                <button class="btn btn-secondary" onclick="pauseSpeech()">
+                    <i class="fas fa-pause"></i> إيقاف مؤقت
+                </button>
+                <button class="btn btn-secondary" onclick="resumeSpeech()">
+                    <i class="fas fa-play"></i> استئناف
+                </button>
+                <button class="btn btn-danger" onclick="stopSpeech()">
+                    <i class="fas fa-stop"></i> إيقاف
+                </button>
+                <button class="btn btn-success" onclick="saveAsAudio()">
+                    <i class="fas fa-download"></i> حفظ كملف صوتي
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2><i class="fas fa-microphone"></i> تحويل الكلام إلى نص</h2>
+            
+            <div class="status-indicator">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="statusText">جاهز للتسجيل</span>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-success" onclick="startRecognition()" id="startBtn">
+                    <i class="fas fa-microphone"></i> بدء التسجيل
+                </button>
+                <button class="btn btn-danger" onclick="stopRecognition()" id="stopBtn" disabled>
+                    <i class="fas fa-stop-circle"></i> إيقاف التسجيل
+                </button>
+                <button class="btn btn-secondary" onclick="clearResults()">
+                    <i class="fas fa-trash"></i> مسح النتائج
+                </button>
+                <button class="btn btn-primary" onclick="copyToClipboard()">
+                    <i class="fas fa-copy"></i> نسخ النص
+                </button>
+            </div>
+
+            <div class="textarea-container">
+                <textarea id="speechToText" placeholder="النص المحول من الكلام سيظهر هنا..." readonly></textarea>
+                <div class="textarea-info">
+                    <span id="recognitionCount">0 كلمة</span>
+                    <span id="confidenceLevel">دقة: 0%</span>
+                </div>
+            </div>
+
+            <div class="results hidden" id="resultsBox">
+                <h3><i class="fas fa-chart-line"></i> إحصائيات التسجيل</h3>
+                <p id="recordingStats">مدة التسجيل: 0 ثانية | الكلمات المكتشفة: 0</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2024 أداة تحويل النص والكلام المتقدمة | تم التطوير باستخدام Web Speech API</p>
+            <p>متوافق مع جميع المتصفحات الحديثة</p>
+        </footer>
+    </div>
+
+    <script>
+        // ============ متغيرات عامة ============
+        let recognition = null;
+        let recognizing = false;
+        let speechLanguage = 'ar-SA';
+        let recordingStartTime = 0;
+        let wordCount = 0;
+        let speechSynthesis = window.speechSynthesis;
+        let currentUtterance = null;
+
+        // ============ تهيئة التطبيق ============
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            setupEventListeners();
+            updateTextCounts();
+        });
+
+        function initializeApp() {
+            // تهيئة تحويل الكلام إلى نص
+            if ('webkitSpeechRecognition' in window) {
+                recognition = new webkitSpeechRecognition();
+            } else if ('SpeechRecognition' in window) {
+                recognition = new SpeechRecognition();
+            } else {
+                showError('عذراً، متصفحك لا يدعم ميزة تحويل الكلام إلى نص');
+                return;
+            }
+
+            if (recognition) {
+                recognition.lang = speechLanguage;
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.maxAlternatives = 3;
+
+                recognition.onstart = () => {
+                    recognizing = true;
+                    recordingStartTime = Date.now();
+                    updateStatus('جاري التسجيل...', true);
+                    document.getElementById('startBtn').disabled = true;
+                    document.getElementById('stopBtn').disabled = false;
+                    updateRecordingTimer();
+                };
+
+                recognition.onend = () => {
+                    recognizing = false;
+                    updateStatus('تم إيقاف التسجيل', false);
+                    document.getElementById('startBtn').disabled = false;
+                    document.getElementById('stopBtn').disabled = true;
+                    document.getElementById('resultsBox').classList.remove('hidden');
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('خطأ في التعرف:', event.error);
+                    showError(`خطأ في التعرف: ${getErrorText(event.error)}`);
+                    recognizing = false;
+                    updateStatus('توقف بسبب خطأ', false);
+                    document.getElementById('startBtn').disabled = false;
+                    document.getElementById('stopBtn').disabled = true;
+                };
+
+                recognition.onresult = (event) => {
+                    let finalTranscript = '';
+                    let interimTranscript = '';
+                    let confidence = 0;
+                    let resultsCount = 0;
+
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const transcript = event.results[i][0].transcript;
+                        if (event.results[i].isFinal) {
+                            finalTranscript += transcript;
+                            confidence += event.results[i][0].confidence;
+                            resultsCount++;
+                            wordCount += transcript.split(' ').length;
+                        } else {
+                            interimTranscript += transcript;
+                        }
+                    }
+
+                    const textarea = document.getElementById('speechToText');
+                    const currentText = textarea.value.replace(/\s*\[جاري الكتابة...\]\s*$/, '');
+                    
+                    if (finalTranscript) {
+                        textarea.value = currentText + finalTranscript + '\n';
+                    }
+                    
+                    if (interimTranscript) {
+                        textarea.value = currentText + ' [جاري الكتابة...] ' + interimTranscript;
+                    }
+
+                    // تحديث الإحصائيات
+                    updateRecognitionStats(resultsCount > 0 ? (confidence / resultsCount) * 100 : 0);
+                };
+            }
+        }
+
+        function setupEventListeners() {
+            // تحديث عدادات النص
+            document.getElementById('textToSpeak').addEventListener('input', updateTextCounts);
+            
+            // تحديث عروض السلايدر
+            document.getElementById('rate').addEventListener('input', (e) => {
+                document.getElementById('rateValue').textContent = e.target.value;
+            });
+            
+            document.getElementById('pitch').addEventListener('input', (e) => {
+                document.getElementById('pitchValue').textContent = e.target.value;
+            });
+            
+            document.getElementById('volume').addEventListener('input', (e) => {
+                document.getElementById('volumeValue').textContent = e.target.value;
+            });
+            
+            // اختصار لوحة المفاتيح
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    speakText();
+                }
+                
+                if (e.key === 'Escape' && recognizing) {
+                    stopRecognition();
+                }
+            });
+        }
+
+        // ============ تحويل النص إلى كلام ============
+        function speakText() {
+            const text = document.getElementById('textToSpeak').value.trim();
+            if (!text) {
+                showError('يرجى إدخال نص للتشغيل');
+                return;
+            }
+
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+            }
+
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentUtterance.lang = speechLanguage;
+            currentUtterance.rate = parseFloat(document.getElementById('rate').value);
+            currentUtterance.pitch = parseFloat(document.getElementById('pitch').value);
+            currentUtterance.volume = parseFloat(document.getElementById('volume').value);
+
+            currentUtterance.onstart = () => {
+                console.log('بدأ تشغيل النص');
+            };
+
+            currentUtterance.onend = () => {
+                console.log('انتهى تشغيل النص');
+                currentUtterance = null;
+            };
+
+            currentUtterance.onerror = (event) => {
+                console.error('خطأ في تشغيل النص:', event);
+                showError('حدث خطأ أثناء تشغيل النص');
+                currentUtterance = null;
+            };
+
+            speechSynthesis.speak(currentUtterance);
+        }
+
+        function pauseSpeech() {
+            if (speechSynthesis.speaking) {
+                speechSynthesis.pause();
+            }
+        }
+
+        function resumeSpeech() {
+            if (speechSynthesis.paused) {
+                speechSynthesis.resume();
+            }
+        }
+
+        function stopSpeech() {
+            speechSynthesis.cancel();
+            currentUtterance = null;
+        }
+
+        // ============ تحويل الكلام إلى نص ============
+        function startRecognition() {
+            if (!recognition) {
+                showError('ميزة التعرف على الكلام غير مدعومة في متصفحك');
+                return;
+            }
+
+            try {
+                recognition.start();
+            } catch (error) {
+                showError('فشل في بدء التسجيل: ' + error.message);
+            }
+        }
+
+        function stopRecognition() {
+            if (recognition && recognizing) {
+                try {
+                    recognition.stop();
+                } catch (error) {
+                    console.error('خطأ في إيقاف التسجيل:', error);
+                }
+            }
+        }
+
+        // ============ وظائف مساعدة ============
+        function setLanguage(lang) {
+            speechLanguage = lang;
+            
+            // تحديد زر اللغة النشط
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            if (recognition) {
+                recognition.lang = lang;
+            }
+            
+            // تغيير لغة النص في الخانات
+            document.getElementById('textToSpeak').placeholder = 
+                lang === 'ar-SA' ? 'اكتب النص هنا أو الصقه...' : 
+                lang === 'en-US' ? 'Type or paste text here...' : 
+                'Tapez ou collez le texte ici...';
+                
+            showSuccess(`تم تغيير اللغة إلى ${getLanguageName(lang)}`);
+        }
+
+        function updateTextCounts() {
+            const text = document.getElementById('textToSpeak').value;
+            const charCount = text.length;
+            const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+            
+            document.getElementById('charCount').textContent = `${charCount} حرف`;
+            document.getElementById('wordCount').textContent = `${wordCount} كلمة`;
+        }
+
+        function updateRecognitionStats(confidence) {
+            const text = document.getElementById('speechToText').value;
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            
+            document.getElementById('recognitionCount').textContent = `${words} كلمة`;
+            document.getElementById('confidenceLevel').textContent = `دقة: ${confidence.toFixed(1)}%`;
+        }
+
+        function updateStatus(message, isActive) {
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            
+            statusText.textContent = message;
+            if (isActive) {
+                statusDot.classList.add('active');
+            } else {
+                statusDot.classList.remove('active');
+            }
+        }
+
+        function updateRecordingTimer() {
+            if (!recognizing) return;
+            
+            const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            
+            document.getElementById('recordingStats').textContent = 
+                `مدة التسجيل: ${minutes}:${seconds.toString().padStart(2, '0')} | الكلمات المكتشفة: ${wordCount}`;
+            
+            setTimeout(updateRecordingTimer, 1000);
+        }
+
+        function clearResults() {
+            document.getElementById('speechToText').value = '';
+            document.getElementById('recognitionCount').textContent = '0 كلمة';
+            document.getElementById('confidenceLevel').textContent = 'دقة: 0%';
+            document.getElementById('resultsBox').classList.add('hidden');
+            wordCount = 0;
+        }
+
+        function copyToClipboard() {
+            const text = document.getElementById('speechToText').value;
+            if (!text.trim()) {
+                showError('لا يوجد نص للنسخ');
+                return;
+            }
+            
+            navigator.clipboard.writeText(text)
+                .then(() => showSuccess('تم نسخ النص إلى الحافظة'))
+                .catch(() => showError('فشل في نسخ النص'));
+        }
+
+        async function saveAsAudio() {
+            const text = document.getElementById('textToSpeak').value.trim();
+            if (!text) {
+                showError('يرجى إدخال نص لحفظه كملف صوتي');
+                return;
+            }
+            
+            showError('هذه الميزة تحتاج إلى API متقدم (مثل Azure أو Google Text-to-Speech)');
+            // في الإصدار الحقيقي، يمكن دمج مع API خارجية لتحويل النص إلى ملف صوتي
+        }
+
+        // ============ وظائف عرض الرسائل ============
+        function showError(message) {
+            alert(`❌ ${message}`);
+        }
+
+        function showSuccess(message) {
+            alert(`✅ ${message}`);
+        }
+
+        function getErrorText(error) {
+            const errors = {
+                'no-speech': 'لم يتم اكتشاف كلام',
+                'audio-capture': 'لا يمكن الوصول إلى الميكروفون',
+                'not-allowed': 'تم رفض الإذن',
+                'network': 'خطأ في الشبكة',
+                'aborted': 'تم إلغاء العملية',
+                'service-not-allowed': 'الخدمة غير مسموحة'
+            };
+            return errors[error] || `خطأ غير معروف: ${error}`;
+        }
+
+        function getLanguageName(code) {
+            const languages = {
+                'ar-SA': 'العربية',
+                'en-US': 'الإنجليزية',
+                'fr-FR': 'الفرنسية'
+            };
+            return languages[code] || code;
+        }
+    </script>
+</body>
+</html>

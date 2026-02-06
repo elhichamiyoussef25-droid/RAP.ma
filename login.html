@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>تسجيل الدخول</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth">
+
+<form class="auth-box" onsubmit="login(event)">
+    <h2>تسجيل الدخول</h2>
+
+    <input id="loginUser" type="text" placeholder="اسم المستخدم" required>
+    <input id="loginPass" type="password" placeholder="كلمة المرور" required>
+
+    <button type="submit">دخول</button>
+
+    <p>
+        ليس لديك حساب؟
+        <a href="register.html">إنشاء حساب</a>
+    </p>
+</form>
+
+<script>
+function login(e) {
+    e.preventDefault();
+
+    const saved = JSON.parse(localStorage.getItem("account"));
+
+    if (!saved) {
+        alert("لا يوجد حساب مسجل");
+        return;
+    }
+
+    if (
+        loginUser.value === saved.user &&
+        loginPass.value === saved.pass
+    ) {
+        localStorage.setItem("loggedIn", "true");
+        window.location.href = "home.html";
+    } else {
+        alert("بيانات الدخول غير صحيحة");
+    }
+}
+</script>
+
+</body>
+</html>
+

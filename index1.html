@@ -1,0 +1,395 @@
+<script src="https://pl28646590.effectivegatecpm.com/8c/c9/bd/8cc9bd141b76286d43ebce2b8a91a4e7.js"></script>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>أدوات المطورين | Developer Tools</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6ee7ff;
+            --secondary: #4dffb8;
+            --accent: #ff6b6b;
+            --bg-main: #0b0f1a;
+            --bg-glass: rgba(255, 255, 255, 0.08);
+            --border-glass: rgba(255, 255, 255, 0.18);
+            --text-main: #e6e6ff;
+            --text-muted: #9aa0c3;
+        }
+
+        body {
+            background: radial-gradient(circle at top, #121a3a, var(--bg-main));
+            color: var(--text-main);
+            font-family: "Segoe UI", "Tajawal", system-ui, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, var(--accent), #ff4757);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            z-index: 1000;
+            font-size: 1rem;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 20px 40px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* شبكة الأدوات */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .tool-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .tool-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tool-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--text-main);
+        }
+
+        .tool-description {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .try-btn {
+            background: linear-gradient(135deg, var(--primary), #4db8ff);
+            color: black;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .try-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(110, 231, 255, 0.3);
+        }
+
+        .try-btn i {
+            font-size: 1.2rem;
+        }
+
+        /* أنماط للأدوات المختلفة */
+        .tool-card:nth-child(1) {
+            border-top: 4px solid #6ee7ff;
+        }
+        .tool-card:nth-child(2) {
+            border-top: 4px solid #4dffb8;
+        }
+        .tool-card:nth-child(3) {
+            border-top: 4px solid #ff6b6b;
+        }
+        .tool-card:nth-child(4) {
+            border-top: 4px solid #ffb84d;
+        }
+        .tool-card:nth-child(5) {
+            border-top: 4px solid #9b6bff;
+        }
+        .tool-card:nth-child(6) {
+            border-top: 4px solid #ff6bd6;
+        }
+
+        /* الصفحات الفرعية (سيتم إنشاؤها لاحقاً) */
+        .coming-soon {
+            background: linear-gradient(135deg, var(--accent), #ff4757);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tool-card {
+                min-height: 180px;
+                padding: 25px 20px;
+            }
+            
+            .tool-icon {
+                font-size: 2.8rem;
+                height: 60px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 60px 15px 30px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .back-btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <button class="back-btn" onclick="window.location.href='../home.html'">
+        <i class="fas fa-arrow-left"></i>
+        العودة للرئيسية
+    </button>
+
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-tools"></i> أدوات المطورين المجانية</h1>
+            <p>مجموعة من الأدوات المساعدة لتطوير الألعاب. اختر أداة وجربها مباشرة!</p>
+        </div>
+
+        <div class="tools-grid">
+            <!-- أداة 1 -->
+            <div class="tool-card" onclick="window.location.href='tool1.html'">
+                <div class="tool-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h3>مصحح الأكواد السريع</h3>
+                <p class="tool-description">
+                    أدخل كود لعبتك وسنقوم بتصحيح الأخطاء الشائعة تلقائياً
+                </p>
+                <button class="try-btn">
+                    <i class="fas fa-play"></i>
+                    جرب هذه الأداة
+                </button>
+            </div>
+<script src="https://pl28646590.effectivegatecpm.com/8c/c9/bd/8cc9bd141b76286d43ebce2b8a91a4e7.js"></script>
+            <!-- أداة 2 -->
+            <div class="tool-card" onclick="window.location.href='tool2.html'">
+                <div class="tool-icon">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <h3>مولد الألوان</h3>
+                <p class="tool-description">
+                    أنشئ أنظمة ألوان متجانسة لألعابك مع أكواد CSS جاهزة
+                </p>
+                <button class="try-btn">
+                    <i class="fas fa-play"></i>
+                    جرب هذه الأداة
+                </button>
+            </div>
+
+            <!-- أداة 3 -->
+            <div class="tool-card" onclick="window.location.href='tool3.html'">
+                <div class="tool-icon">
+                    <i class="fas fa-music"></i>
+                </div>
+                <h3>منشئ المؤثرات الصوتية</h3>
+                <p class="tool-description">
+                    أنشئ مؤثرات صوتية بسيطة لألعابك بدون برامج معقدة
+                </p>
+                <button class="try-btn">
+                    <i class="fas fa-play"></i>
+                    جرب هذه الأداة
+                </button>
+            </div>
+
+            <!-- أداة 4 -->
+            <div class="tool-card" onclick="window.location.href='tool4.html'">
+                <div class="tool-icon">
+                    <i class="fas fa-image"></i>
+                </div>
+                <h3>محرر الصور البسيط</h3>
+                <p class="tool-description">
+                    عدل صور ألعابك مباشرة في المتصفح (قص، تدوير، تغيير حجم)
+                </p>
+                <button class="try-btn">
+                    <i class="fas fa-play"></i>
+                    جرب هذه الأداة
+                </button>
+            </div>
+
+            <!-- أداة 5 -->
+            <div class="tool-card" onclick="window.location.href='tool5.html'">
+                <div class="tool-icon">
+                    <i class="fas fa-gamepad"></i>
+                </div>
+                <h3>مولد كود التحكم</h3>
+                <p class="tool-description">
+                    أنشئ كود JavaScript جاهز للتحكم في الشخصيات بلوحة المفاتيح
+                </p>
+                <button class="try-btn">
+                    <i class="fas fa-play"></i>
+                    جرب هذه الأداة
+                </button>
+            </div>
+
+            <!-- أداة 6 -->
+            <div class="tool-card" onclick="window.location.href='tool6.html'">
+                <div class="tool-icon">
+                    <i class="fas fa-question-circle"></i>
+                </div>
+                <h3>مساعد البرمجة</h3>
+                <p class="tool-description">
+                    اكتب مشكلتك البرمجية وسنقدم لك حلاً أو فكرة لحلها
+                </p>
+                <button class="try-btn">
+                    <i class="fas fa-play"></i>
+                    جرب هذه الأداة
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // تأثيرات بسيطة عند التمرير
+        document.addEventListener('DOMContentLoaded', function() {
+            const toolCards = document.querySelectorAll('.tool-card');
+            
+            // إضافة تأثير عند تحميل الصفحة
+            toolCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // تحسين تجربة الهاتف
+            if ('ontouchstart' in window) {
+                document.querySelectorAll('.tool-card').forEach(card => {
+                    card.style.cursor = 'pointer';
+                });
+            }
+        });
+
+        // إضافة تأثير النقر
+        document.querySelectorAll('.tool-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                // منع النقر المزدوج
+                if (this.classList.contains('clicked')) return;
+                
+                this.classList.add('clicked');
+                
+                // تأثير بسيط
+                this.style.transform = 'scale(0.98)';
+                
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+                
+                setTimeout(() => {
+                    this.classList.remove('clicked');
+                }, 500);
+            });
+        });
+<script src="https://pl28646590.effectivegatecpm.com/8c/c9/bd/8cc9bd141b76286d43ebce2b8a91a4e7.js"></script>
+    </script>
+<script src="https://pl28646590.effectivegatecpm.com/8c/c9/bd/8cc9bd141b76286d43ebce2b8a91a4e7.js"></script>
+</body>
+</html>

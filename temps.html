@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>TEMP - لعبة التوقيت بالمفاتيح</title>
+    <style>
+        :root {
+            --primary: #6ee7ff;
+            --secondary: #4dffb8;
+            --accent: #ff6b6b;
+            --player1: #ff6b6b;
+            --player2: #4dffb8;
+            --player3: #6ee7ff;
+            --player4: #ffdd59;
+            --bg-dark: #050812;
+            --bg-glass: rgba(255, 255, 255, 0.08);
+            --border-glass: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(circle at top, #1b245a, var(--bg-dark));
+            color: white;
+            font-family: "Segoe UI", "Tajawal", sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .game-box {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 25px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--player1), var(--player2), var(--player3), var(--player4));
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--player1), var(--player2), var(--player3));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(110, 231, 255, 0.3);
+        }
+
+        .subtitle {
+            color: #aaa;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .game-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .game-info {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .info-box {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-label {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .target-time {
+            font-size: 2.8rem;
+            color: var(--secondary);
+            font-weight: bold;
+            text-shadow: 0 0 15px rgba(77, 255, 184, 0.4);
+        }
+
+        .remaining {
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        .game-display {
+            margin: 40px 0;
+            position: relative;
+        }
+
+        .timer-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .timer {
+            font-size: 5rem;
+            font-weight: bold;
+            letter-spacing: 3px;
+            color: white;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .timer-progress {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin: 20px auto;
+            overflow: hidden;
+            max-width: 600px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--player1), var(--player2), var(--player3), var(--player4));
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .timer-label {
+            color: #888;
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 40px 0;
+        }
+
+        @media (max-width: 768px) {
+            .players-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .players-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .player-card {
+            padding: 25px 15px;
+            border-radius: 15px;
+            border: 3px solid transparent;
+            background: rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .player-card.active {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .player-card.waiting {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .player-card.stopped {
+            border-color: currentColor;
+        }
+
+        .player-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .player-key {
+            font-size: 4rem;
+            font-weight: bold;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .player-key-label {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        .player-info {
+            font-size: 0.9rem;
+            margin-top: 10px;
+            color: #aaa;
+            min-height: 20px;
+        }
+
+        .player-time {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 5px;
+            min-height: 30px;
+        }
+
+        .key-instructions {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .key-instruction {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .key-box {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            border: 2px solid transparent;
+        }
+
+        .key-label {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .result-panel {
+            margin-top: 40px;
+            padding: 25px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            border: 1px solid var(--border-glass);
+            display: none;
+        }
+
+        .result-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+
+        .winner-info {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .result-details {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .result-details {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .result-details {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .player-result {
+            padding: 20px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid transparent;
+        }
+
+        .result-time {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .result-diff {
+            font-size: 1rem;
+            color: #aaa;
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, var(--accent), #ff4757);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
+        }
+
+        .action-btn.restart {
+            background: linear-gradient(135deg, var(--primary), #4db8ff);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @keyframes countdown {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .countdown {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 10rem;
+            color: var(--primary);
+            z-index: 100;
+            animation: countdown 0.5s ease-out;
+        }
+
+        .instructions {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            text-align: right;
+            font-size: 0.95rem;
+            color: #aaa;
+        }
+
+        .instructions h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            list-style: none;
+            padding-right: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 10px;
+            padding-right: 10px;
+        }
+
+        .key-pressed {
+            animation: shake 0.3s ease;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="game-container">
+    <div class="game-box">
+        <h1>⏱ TEMP - مفاتيح</h1>
+        <p class="subtitle">اضغط على الحرف المخصص لك لإيقاف المؤقت!</p>
+        
+        <div class="game-info">
+            <div class="info-box">
+                <div class="info-label">الرقم المطلوب</div>
+                <div class="target-time" id="targetTime">0.00</div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">المتبقون</div>
+                <div class="remaining" id="remainingPlayers">4 لاعبون</div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">حالة اللعبة</div>
+                <div class="remaining" id="gameStatus">في الانتظار...</div>
+            </div>
+        </div>
+
+        <div class="game-display">
+            <div class="timer-container">
+                <div class="timer" id="timer">0.00</div>
+                <div class="timer-label">ثواني</div>
+            </div>
+            <div class="timer-progress">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+        </div>
+
+        <div class="players-grid" id="playersContainer">
+            <!-- سيتم ملؤها باللاعبين -->
+        </div>
+
+        <div class="key-instructions">
+            <div class="key-instruction">
+                <div class="key-box" style="border-color: var(--player1); color: var(--player1);">A</div>
+                <div class="key-label">اللاعب 1</div>
+            </div>
+            <div class="key-instruction">
+                <div class="key-box" style="border-color: var(--player2); color: var(--player2);">P</div>
+                <div class="key-label">اللاعب 2</div>
+            </div>
+            <div class="key-instruction">
+                <div class="key-box" style="border-color: var(--player3); color: var(--player3);">L</div>
+                <div class="key-label">اللاعب 3</div>
+            </div>
+            <div class="key-instruction">
+                <div class="key-box" style="border-color: var(--player4); color: var(--player4);">X</div>
+                <div class="key-label">اللاعب 4</div>
+            </div>
+        </div>
+
+        <div class="result-panel" id="resultPanel">
+            <div class="result-title">🎉 النتيجة النهائية</div>
+            <div class="winner-info" id="winnerInfo"></div>
+            
+            <div class="result-details" id="resultsContainer">
+                <!-- سيتم ملؤها بالنتائج -->
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="action-btn restart" onclick="startGame()" id="startBtn">بدء اللعبة</button>
+            <button class="action-btn" onclick="resetGame()" id="resetBtn">إعادة تعيين</button>
+        </div>
+
+        <div class="instructions">
+            <h3>🎮 كيفية اللعب:</h3>
+            <ul>
+                <li>كل لاعب لديه مفتاح إيقاف خاص:<br>
+                    • <span style="color: var(--player1)">اللاعب 1: A</span><br>
+                    • <span style="color: var(--player2)">اللاعب 2: P</span><br>
+                    • <span style="color: var(--player3)">اللاعب 3: L</span><br>
+                    • <span style="color: var(--player4)">اللاعب 4: X</span>
+                </li>
+                <li>المؤقت يبدأ من 0.00 ويصل إلى 9.99</li>
+                <li>اضغط على المفتاح المخصص لك عندما تعتقد أن المؤقت وصل للرقم المستهدف</li>
+                <li>الفائز هو أقرب لاعب للرقم المستهدف</li>
+                <li>تحتاج لاعبين على الأقل للبدء</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+
+// في نهاية كل لعبة، عند انتهاء الجولة:
+function gameFinished(winner, score) {
+    // حساب النقاط بناءً على النتيجة
+    const pointsEarned = Math.floor(score * 10);
+    
+    // إرسال النقاط إلى النظام الرئيسي
+    if (typeof parent !== 'undefined' && parent.pointsSystem) {
+        parent.pointsSystem.addPoints(pointsEarned, 'game');
+    } else {
+        // حفظ مؤقت في localStorage
+        const pendingPoints = JSON.parse(localStorage.getItem('pendingPoints') || '[]');
+        pendingPoints.push({
+            amount: pointsEarned,
+            game: 'اسم اللعبة',
+            timestamp: new Date().toISOString()
+        });
+        localStorage.setItem('pendingPoints', JSON.stringify(pendingPoints));
+    }
+    
+    // عرض النقاط المكتسبة
+    alert(`🎉 فوز! ربحت ${pointsEarned} نقطة!`);
+}
+
+    // حالة اللعبة
+    const gameState = {
+        time: 0,
+        timerInterval: null,
+        targetTime: 0,
+        isRunning: false,
+        stoppedPlayers: new Set(),
+        playerTimes: {},
+        results: {},
+        countdownActive: false,
+        // مفاتيح اللاعبين - يمكن تعديلها
+        playerKeys: {
+            1: { key: 'A', color: 'var(--player1)', name: 'اللاعب 1' },
+            2: { key: 'P', color: 'var(--player2)', name: 'اللاعب 2' },
+            3: { key: 'L', color: 'var(--player3)', name: 'اللاعب 3' },
+            4: { key: 'X', color: 'var(--player4)', name: 'اللاعب 4' }
+        },
+        totalPlayers: 4
+    };
+
+    // عناصر DOM
+    const timerElement = document.getElementById('timer');
+    const targetTimeElement = document.getElementById('targetTime');
+    const progressBar = document.getElementById('progressBar');
+    const remainingPlayersElement = document.getElementById('remainingPlayers');
+    const gameStatusElement = document.getElementById('gameStatus');
+    const resultPanel = document.getElementById('resultPanel');
+    const winnerInfoElement = document.getElementById('winnerInfo');
+    const startBtn = document.getElementById('startBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const playersContainer = document.getElementById('playersContainer');
+    const resultsContainer = document.getElementById('resultsContainer');
+
+    // تهيئة اللعبة
+    function initGame() {
+        // إنشاء رقم مستهدف عشوائي
+        gameState.targetTime = (Math.random() * 9 + 0.5).toFixed(2);
+        targetTimeElement.textContent = gameState.targetTime;
+        
+        // إعادة تعيين الحالة
+        gameState.time = 0;
+        gameState.isRunning = false;
+        gameState.stoppedPlayers.clear();
+        gameState.playerTimes = {};
+        gameState.results = {};
+        
+        // تحديث الواجهة
+        timerElement.textContent = '0.00';
+        progressBar.style.width = '0%';
+        remainingPlayersElement.textContent = `${gameState.totalPlayers} لاعبون`;
+        gameStatusElement.textContent = 'في الانتظار...';
+        resultPanel.style.display = 'none';
+        
+        // إنشاء بطاقات اللاعبين
+        createPlayerCards();
+        
+        // تفعيل أزرار التحكم
+        startBtn.disabled = false;
+        resetBtn.disabled = true;
+    }
+
+    // إنشاء بطاقات اللاعبين
+    function createPlayerCards() {
+        playersContainer.innerHTML = '';
+        
+        for (let i = 1; i <= gameState.totalPlayers; i++) {
+            const player = gameState.playerKeys[i];
+            const card = document.createElement('div');
+            card.className = 'player-card waiting';
+            card.id = `playerCard${i}`;
+            card.style.borderColor = player.color;
+            
+            card.innerHTML = `
+                <div class="player-number" style="color: ${player.color}">${player.name}</div>
+                <div class="player-key-label">المفتاح المخصص:</div>
+                <div class="player-key" style="color: ${player.color}">${player.key}</div>
+                <div class="player-info" id="playerInfo${i}">في الانتظار...</div>
+                <div class="player-time" id="playerTime${i}"></div>
+            `;
+            
+            playersContainer.appendChild(card);
+        }
+    }
+
+    // بدء العد التنازلي
+    function startCountdown() {
+        if (gameState.countdownActive) return;
+        
+        gameState.countdownActive = true;
+        let count = 3;
+        
+        const countdownDiv = document.createElement('div');
+        countdownDiv.className = 'countdown';
+        countdownDiv.textContent = count;
+        document.body.appendChild(countdownDiv);
+        
+        const countdownInterval = setInterval(() => {
+            count--;
+            if (count > 0) {
+                countdownDiv.textContent = count;
+            } else {
+                clearInterval(countdownInterval);
+                countdownDiv.textContent = 'ابدأ!';
+                setTimeout(() => {
+                    document.body.removeChild(countdownDiv);
+                    gameState.countdownActive = false;
+                    startTimer();
+                }, 500);
+            }
+        }, 1000);
+    }
+
+    // بدء المؤقت
+    function startTimer() {
+        if (gameState.isRunning) return;
+        
+        gameState.isRunning = true;
+        gameStatusElement.textContent = 'جارٍ العد... اضغط على المفتاح المخصص!';
+        startBtn.disabled = true;
+        resetBtn.disabled = false;
+        
+        // تحديث حالة اللاعبين
+        for (let i = 1; i <= gameState.totalPlayers; i++) {
+            document.getElementById(`playerInfo${i}`).textContent = 'جاهز للإيقاف...';
+            document.getElementById(`playerCard${i}`).classList.add('active');
+        }
+        
+        gameState.timerInterval = setInterval(() => {
+            gameState.time += 0.01;
+            if (gameState.time >= 9.99) {
+                gameState.time = 0;
+            }
+            
+            // تحديث العرض
+            timerElement.textContent = gameState.time.toFixed(2);
+            
+            // تحديث شريط التقدم
+            const progress = (gameState.time / 9.99) * 100;
+            progressBar.style.width = `${progress}%`;
+            
+            // التحقق إذا أوقف جميع اللاعبين
+            if (gameState.stoppedPlayers.size >= 2 && 
+                gameState.stoppedPlayers.size >= gameState.totalPlayers) {
+                endGame();
+            }
+        }, 10);
+    }
+
+    // إيقاف المؤثر من قبل لاعب
+    function stopTimer(playerId) {
+        if (!gameState.isRunning || gameState.stoppedPlayers.has(playerId)) return;
+        
+        // تسجيل وقت اللاعب
+        gameState.stoppedPlayers.add(playerId);
+        gameState.playerTimes[playerId] = gameState.time;
+        
+        // حساب الفرق عن الرقم المستهدف
+        const difference = Math.abs(gameState.time - parseFloat(gameState.targetTime));
+        gameState.results[playerId] = difference;
+        
+        // تحديث واجهة اللاعب مع تأثير
+        const card = document.getElementById(`playerCard${playerId}`);
+        const info = document.getElementById(`playerInfo${playerId}`);
+        const timeDisplay = document.getElementById(`playerTime${playerId}`);
+        
+        card.classList.remove('waiting', 'active');
+        card.classList.add('stopped');
+        
+        info.textContent = 'تم الإيقاف';
+        timeDisplay.textContent = `الوقت: ${gameState.time.toFixed(2)}`;
+        timeDisplay.style.color = gameState.playerKeys[playerId].color;
+        
+        // تأثير اهتزاز للمفتاح في اللوحة العلوية
+        const keyBox = document.querySelector(`.key-box:nth-child(${playerId})`);
+        if (keyBox) {
+            keyBox.classList.add('key-pressed');
+            setTimeout(() => keyBox.classList.remove('key-pressed'), 300);
+        }
+        
+        // تحديث عدد اللاعبين المتبقين
+        const remaining = gameState.totalPlayers - gameState.stoppedPlayers.size;
+        remainingPlayersElement.textContent = `${remaining} ${remaining === 1 ? 'لاعب' : 'لاعبون'}`;
+        
+        // التحقق إذا كان هناك فائز
+        if (gameState.stoppedPlayers.size >= 2) {
+            if (remaining === 0 || gameState.stoppedPlayers.size === gameState.totalPlayers) {
+                endGame();
+            }
+        }
+    }
+
+    // إنهاء اللعبة وعرض النتائج
+    function endGame() {
+        clearInterval(gameState.timerInterval);
+        gameState.isRunning = false;
+        gameStatusElement.textContent = 'انتهت اللعبة';
+        
+        // العثور على الفائز (أقل فرق عن الرقم المستهدف)
+        let winner = null;
+        let minDifference = Infinity;
+        
+        for (const [playerId, diff] of Object.entries(gameState.results)) {
+            if (diff < minDifference) {
+                minDifference = diff;
+                winner = parseInt(playerId);
+            }
+        }
+        
+        // تحديث بطاقة الفائز
+        if (winner) {
+            const winnerCard = document.getElementById(`playerCard${winner}`);
+            winnerCard.innerHTML += '<div style="margin-top: 10px; font-size: 1.5rem;">🏆</div>';
+        }
+        
+        // عرض النتائج
+        displayResults(winner);
+    }
+
+    // عرض النتائج النهائية
+    function displayResults(winner) {
+        resultPanel.style.display = 'block';
+        
+        if (winner) {
+            winnerInfoElement.textContent = `🎉 الفائز: ${gameState.playerKeys[winner].name} (الفرق: ${gameState.results[winner].toFixed(3)} ثانية)`;
+            winnerInfoElement.style.color = gameState.playerKeys[winner].color;
+        } else {
+            winnerInfoElement.textContent = 'لا يوجد فائز';
+        }
+        
+        resultsContainer.innerHTML = '';
+        
+        // إنشاء بطاقات النتائج لكل لاعب
+        for (let i = 1; i <= gameState.totalPlayers; i++) {
+            const player = gameState.playerKeys[i];
+            const playerResult = document.createElement('div');
+            playerResult.className = 'player-result';
+            playerResult.style.borderColor = player.color;
+            
+            if (gameState.stoppedPlayers.has(i)) {
+                const time = gameState.playerTimes[i];
+                const diff = gameState.results[i];
+                const isWinner = i === winner;
+                
+                playerResult.innerHTML = `
+                    <div style="font-weight: bold; color: ${player.color}; font-size: 1.2rem;">
+                        ${player.name} ${isWinner ? '👑' : ''}
+                    </div>
+                    <div style="color: #aaa; margin: 5px 0;">المفتاح: ${player.key}</div>
+                    <div class="result-time" style="color: ${player.color}">${time.toFixed(2)} ثانية</div>
+                    <div class="result-diff">الفرق عن الهدف: ${diff.toFixed(3)} ثانية</div>
+                    ${isWinner ? '<div style="margin-top: 10px; color: gold; font-weight: bold;">الفائز!</div>' : ''}
+                `;
+            } else {
+                playerResult.innerHTML = `
+                    <div style="font-weight: bold; color: ${player.color}; font-size: 1.2rem;">
+                        ${player.name}
+                    </div>
+                    <div style="color: #aaa; margin: 5px 0;">المفتاح: ${player.key}</div>
+                    <div class="result-time" style="color: #888">لم يوقف</div>
+                    <div class="result-diff">-</div>
+                `;
+            }
+            
+            resultsContainer.appendChild(playerResult);
+        }
+    }
+
+    // بدء لعبة جديدة
+    function startGame() {
+        initGame();
+        startCountdown();
+    }
+
+    // إعادة تعيين اللعبة
+    function resetGame() {
+        clearInterval(gameState.timerInterval);
+        initGame();
+    }
+
+    // استمع لأحداث لوحة المفاتيح
+    document.addEventListener('keydown', function(event) {
+        if (!gameState.isRunning) return;
+        
+        const key = event.key.toUpperCase();
+        
+        // البحث عن اللاعب الذي يملك هذا المفتاح
+        for (let i = 1; i <= gameState.totalPlayers; i++) {
+            if (gameState.playerKeys[i].key === key) {
+                stopTimer(i);
+                break;
+            }
+        }
+    });
+
+    // إضافة إمكانية تغيير المفاتيح
+    function changePlayerKey(playerId, newKey) {
+        if (newKey && newKey.length === 1) {
+            gameState.playerKeys[playerId].key = newKey.toUpperCase();
+            initGame();
+        }
+    }
+
+    // بدء اللعبة عند تحميل الصفحة
+    window.addEventListener('load', initGame);
+</script>
+
+</body>
+</html>

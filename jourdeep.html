@@ -1,0 +1,1797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadow Duel - 1v1 Stealth Shooter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a14;
+            color: #e0e0ff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header {
+            text-align: center;
+            width: 100%;
+            padding: 15px;
+            border-bottom: 2px solid #2a2a3a;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: #6ee7ff;
+            font-size: 2.8rem;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(110, 231, 255, 0.5);
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            color: #a0a0c0;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .header-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: linear-gradient(145deg, #2a2a4a, #1a1a3a);
+            color: #e0e0ff;
+            border: 1px solid #3a3a5a;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn:hover {
+            background: linear-gradient(145deg, #3a3a5a, #2a2a4a);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-btn:active {
+            transform: translateY(0);
+        }
+
+        .fullscreen-btn {
+            background: linear-gradient(145deg, #4dffb8, #3a9b7a);
+            color: #0a0a14;
+        }
+
+        .game-area {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            background: #111122;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+            border: 1px solid #2a2a3a;
+            transition: all 0.3s ease;
+        }
+
+        .game-area.fullscreen {
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0;
+            border: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9999;
+        }
+
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: none;
+        }
+
+        .ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .ui-panel {
+            background: rgba(20, 20, 40, 0.85);
+            border: 1px solid #3a3a5a;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+        }
+
+        .top-left {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 220px;
+        }
+
+        .top-right {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 220px;
+        }
+
+        .bottom-center {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            text-align: center;
+        }
+
+        .player-title {
+            color: #6ee7ff;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .player-title.sniper {
+            color: #ff6b6b;
+        }
+
+        .player-title.hidden {
+            color: #4dffb8;
+        }
+
+        .stat {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #2a2a3a;
+        }
+
+        .stat-label {
+            color: #a0a0c0;
+        }
+
+        .stat-value {
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .ammo-display {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+
+        .ammo-bullet {
+            width: 12px;
+            height: 20px;
+            background: #444466;
+            border-radius: 2px;
+            border: 1px solid #666688;
+        }
+
+        .ammo-bullet.loaded {
+            background: linear-gradient(to bottom, #ff6b6b, #cc0000);
+            border-color: #ff9999;
+            box-shadow: 0 0 5px rgba(255, 107, 107, 0.5);
+        }
+
+        .timer {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            margin-bottom: 5px;
+        }
+
+        .timer-label {
+            color: #a0a0c0;
+            font-size: 1rem;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-panel {
+            background: rgba(20, 20, 40, 0.8);
+            border-radius: 8px;
+            padding: 20px;
+            width: 48%;
+            min-width: 300px;
+            border: 1px solid #3a3a5a;
+            margin-bottom: 15px;
+        }
+
+        .control-title {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .key {
+            display: inline-block;
+            background: #2a2a3a;
+            color: #e0e0ff;
+            padding: 8px 12px;
+            margin: 5px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+            border: 1px solid #444466;
+            box-shadow: 0 3px 0 #1a1a2a;
+        }
+
+        .control-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .control-label {
+            flex: 1;
+            color: #b0b0d0;
+            min-width: 150px;
+        }
+
+        .powerup-info {
+            background: rgba(20, 20, 40, 0.8);
+            border-radius: 8px;
+            padding: 20px;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 20px;
+            border: 1px solid #3a3a5a;
+        }
+
+        .powerup-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .powerup-item {
+            background: rgba(30, 30, 60, 0.7);
+            border-radius: 6px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid #444466;
+        }
+
+        .powerup-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .powerup-icon.sniper {
+            background: rgba(255, 107, 107, 0.2);
+            border: 2px solid #ff6b6b;
+            color: #ff6b6b;
+        }
+
+        .powerup-icon.hidden {
+            background: rgba(77, 255, 184, 0.2);
+            border: 2px solid #4dffb8;
+            color: #4dffb8;
+        }
+
+        .powerup-desc {
+            flex: 1;
+            font-size: 0.9rem;
+            color: #d0d0ff;
+        }
+
+        .game-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px 50px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 100;
+            border: 2px solid #6ee7ff;
+            box-shadow: 0 0 50px rgba(110, 231, 255, 0.5);
+            display: none;
+            min-width: 300px;
+        }
+
+        .message-title {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #ffffff;
+            text-shadow: 0 0 15px currentColor;
+        }
+
+        .message-subtitle {
+            color: #a0a0c0;
+            margin-bottom: 25px;
+            font-size: 1.2rem;
+        }
+
+        .restart-btn {
+            background: linear-gradient(145deg, #6ee7ff, #4db8ff);
+            color: #0a0a14;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .restart-btn:hover {
+            background: linear-gradient(145deg, #4dffb8, #3a9b7a);
+            transform: scale(1.05);
+        }
+
+        .footer {
+            margin-top: 30px;
+            color: #666688;
+            text-align: center;
+            font-size: 0.9rem;
+            padding: 10px;
+            width: 100%;
+            border-top: 1px solid #2a2a3a;
+        }
+
+        .key-legend {
+            margin-top: 15px;
+            color: #a0a0c0;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .warning {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .control-panel {
+                width: 100%;
+            }
+            
+            .powerup-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-area {
+                height: 500px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .ui-panel {
+                margin: 10px;
+                padding: 10px;
+            }
+            
+            .top-left, .top-right {
+                width: 180px;
+            }
+            
+            .control-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .control-label {
+                margin-bottom: 5px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .game-area {
+                height: 400px;
+            }
+            
+            .ui-panel {
+                margin: 5px;
+                padding: 8px;
+            }
+            
+            .top-left, .top-right {
+                width: 150px;
+                font-size: 0.9rem;
+            }
+            
+            .timer {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>SHADOW DUEL</h1>
+            <p class="subtitle">A 1v1 Stealth Shooter - Sniper vs Hidden Shadow</p>
+            
+            <div class="header-controls">
+                <button class="control-btn fullscreen-btn" id="fullscreenBtn">
+                    <span>⛶</span>
+                    <span id="fullscreenText">FULL SCREEN</span>
+                </button>
+                <button class="control-btn" id="instructionsBtn">
+                    <span>❓</span>
+                    HOW TO PLAY
+                </button>
+                <button class="control-btn" id="soundToggle">
+                    <span>🔊</span>
+                    SOUND: ON
+                </button>
+            </div>
+        </div>
+        
+        <div class="game-area" id="gameArea">
+            <canvas id="gameCanvas"></canvas>
+            
+            <div class="ui-overlay">
+                <div class="ui-panel top-left">
+                    <div class="player-title sniper">SNIPER</div>
+                    <div class="stat">
+                        <span class="stat-label">Ammo</span>
+                        <span class="stat-value" id="ammoCount">6/6</span>
+                    </div>
+                    <div class="ammo-display" id="ammoDisplay"></div>
+                    <div class="stat">
+                        <span class="stat-label">Power-ups</span>
+                        <span class="stat-value" id="sniperPowerups">0</span>
+                    </div>
+                </div>
+                
+                <div class="ui-panel top-right">
+                    <div class="player-title hidden">HIDDEN PLAYER</div>
+                    <div class="stat">
+                        <span class="stat-label">Visibility</span>
+                        <span class="stat-value" id="visibilityLevel">0%</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Speed</span>
+                        <span class="stat-value" id="speedLevel">100%</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Power-ups</span>
+                        <span class="stat-value" id="hiddenPowerups">0</span>
+                    </div>
+                </div>
+                
+                <div class="ui-panel bottom-center">
+                    <div class="timer" id="gameTimer">60.0</div>
+                    <div class="timer-label">SECONDS REMAINING</div>
+                    <div class="key-legend">Press ESC to exit fullscreen</div>
+                </div>
+            </div>
+            
+            <div class="game-message" id="gameMessage">
+                <div class="message-title" id="messageTitle"></div>
+                <div class="message-subtitle" id="messageSubtitle"></div>
+                <button class="restart-btn" id="restartBtn">PLAY AGAIN</button>
+                <div class="warning" id="fullscreenWarning" style="display: none; margin-top: 15px;">
+                    For best experience, use Full Screen mode!
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="control-panel">
+                <div class="control-title sniper">SNIPER CONTROLS</div>
+                <div class="control-row">
+                    <span class="control-label">Aim:</span>
+                    <span class="key">MOUSE</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-label">Shoot:</span>
+                    <span class="key">LEFT CLICK</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-label">Reload (when empty):</span>
+                    <span class="key">R</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-label">Alternative:</span>
+                    <span class="key">SPACE</span>
+                </div>
+            </div>
+            
+            <div class="control-panel">
+                <div class="control-title hidden">HIDDEN PLAYER CONTROLS</div>
+                <div class="control-row">
+                    <span class="control-label">Move:</span>
+                    <div>
+                        <span class="key">↑</span>
+                        <span class="key">↓</span>
+                        <span class="key">←</span>
+                        <span class="key">→</span>
+                    </div>
+                </div>
+                <div class="control-row">
+                    <span class="control-label">Sprint (more visible):</span>
+                    <span class="key">SHIFT</span>
+                </div>
+                <div class="control-row">
+                    <span class="control-label">Alternative:</span>
+                    <div>
+                        <span class="key">W</span>
+                        <span class="key">S</span>
+                        <span class="key">A</span>
+                        <span class="key">D</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="powerup-info">
+            <div class="control-title">POWER-UPS</div>
+            <div class="powerup-grid">
+                <div class="powerup-item">
+                    <div class="powerup-icon sniper">🔵</div>
+                    <div class="powerup-desc">+3 Ammo for Sniper (Circle)</div>
+                </div>
+                <div class="powerup-item">
+                    <div class="powerup-icon sniper">🔵</div>
+                    <div class="powerup-desc">Reveal Hidden Player (1.5s) (Triangle)</div>
+                </div>
+                <div class="powerup-item">
+                    <div class="powerup-icon sniper">🔵</div>
+                    <div class="powerup-desc">Slow Hidden Player (2s) (Square)</div>
+                </div>
+                <div class="powerup-item">
+                    <div class="powerup-icon hidden">🟢</div>
+                    <div class="powerup-desc">Speed Boost (3s) (Circle)</div>
+                </div>
+                <div class="powerup-item">
+                    <div class="powerup-icon hidden">🟢</div>
+                    <div class="powerup-desc">Shield (Blocks 1 shot) (Hexagon)</div>
+                </div>
+                <div class="powerup-item">
+                    <div class="powerup-icon hidden">🟢</div>
+                    <div class="powerup-desc">Crosshair Distortion (Star)</div>
+                </div>
+            </div>
+            <div class="key-legend">
+                Pro Tip: Sniper can collect power-ups by hovering crosshair over them
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        Shadow Duel - A 1v1 Stealth Shooter | Created with HTML5 Canvas & JavaScript |
+        Arrow keys scrolling issue fixed | Fullscreen mode supported
+    </div>
+
+    <script>
+
+// في نهاية كل لعبة، عند انتهاء الجولة:
+function gameFinished(winner, score) {
+    // حساب النقاط بناءً على النتيجة
+    const pointsEarned = Math.floor(score * 10);
+    
+    // إرسال النقاط إلى النظام الرئيسي
+    if (typeof parent !== 'undefined' && parent.pointsSystem) {
+        parent.pointsSystem.addPoints(pointsEarned, 'game');
+    } else {
+        // حفظ مؤقت في localStorage
+        const pendingPoints = JSON.parse(localStorage.getItem('pendingPoints') || '[]');
+        pendingPoints.push({
+            amount: pointsEarned,
+            game: 'اسم اللعبة',
+            timestamp: new Date().toISOString()
+        });
+        localStorage.setItem('pendingPoints', JSON.stringify(pendingPoints));
+    }
+    
+    // عرض النقاط المكتسبة
+    alert(`🎉 فوز! ربحت ${pointsEarned} نقطة!`);
+}
+
+        // Game Constants
+        const CANVAS_WIDTH = 1000;
+        const CANVAS_HEIGHT = 600;
+        const GAME_DURATION = 60; // seconds
+        const SNIPER_AMMO = 6;
+        const HIDDEN_PLAYER_SPEED = 3;
+        const HIDDEN_PLAYER_SPRINT_SPEED = 5;
+        const HIDDEN_PLAYER_RADIUS = 20;
+        const POWERUP_RADIUS = 15;
+        const POWERUP_SPAWN_INTERVAL = 5000; // ms
+        const POWERUP_LIFETIME = 10000; // ms
+        
+        // Power-up types
+        const POWERUP_TYPES = {
+            SNIPER_AMMO: { type: 'sniper', color: '#ff6b6b', shape: 'circle', effect: 'ammo' },
+            SNIPER_REVEAL: { type: 'sniper', color: '#6ee7ff', shape: 'triangle', effect: 'reveal' },
+            SNIPER_SLOW: { type: 'sniper', color: '#9966ff', shape: 'square', effect: 'slow' },
+            HIDDEN_SPEED: { type: 'hidden', color: '#4dffb8', shape: 'circle', effect: 'speed' },
+            HIDDEN_SHIELD: { type: 'hidden', color: '#ffdd59', shape: 'hexagon', effect: 'shield' },
+            HIDDEN_DISTORT: { type: 'hidden', color: '#ff9966', shape: 'star', effect: 'distort' }
+        };
+
+        // DOM Elements
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gameTimer = document.getElementById('gameTimer');
+        const ammoCount = document.getElementById('ammoCount');
+        const ammoDisplay = document.getElementById('ammoDisplay');
+        const visibilityLevel = document.getElementById('visibilityLevel');
+        const speedLevel = document.getElementById('speedLevel');
+        const sniperPowerups = document.getElementById('sniperPowerups');
+        const hiddenPowerups = document.getElementById('hiddenPowerups');
+        const gameMessage = document.getElementById('gameMessage');
+        const messageTitle = document.getElementById('messageTitle');
+        const messageSubtitle = document.getElementById('messageSubtitle');
+        const restartBtn = document.getElementById('restartBtn');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const fullscreenText = document.getElementById('fullscreenText');
+        const gameArea = document.getElementById('gameArea');
+        const instructionsBtn = document.getElementById('instructionsBtn');
+        const soundToggle = document.getElementById('soundToggle');
+        const fullscreenWarning = document.getElementById('fullscreenWarning');
+
+        // Game State
+        let gameActive = false;
+        let gameTime = GAME_DURATION;
+        let lastTime = 0;
+        let soundEnabled = true;
+        let isFullscreen = false;
+        
+        // Sniper State
+        let sniper = {
+            x: CANVAS_WIDTH / 2,
+            y: CANVAS_HEIGHT / 2,
+            ammo: SNIPER_AMMO,
+            maxAmmo: SNIPER_AMMO,
+            reloading: false,
+            recoil: 0,
+            crosshairSize: 20,
+            activePowerups: []
+        };
+        
+        // Hidden Player State
+        let hiddenPlayer = {
+            x: CANVAS_WIDTH * 0.3,
+            y: CANVAS_HEIGHT * 0.5,
+            radius: HIDDEN_PLAYER_RADIUS,
+            speed: HIDDEN_PLAYER_SPEED,
+            baseSpeed: HIDDEN_PLAYER_SPEED,
+            visible: false,
+            visibility: 0,
+            lastMoveTime: 0,
+            isMoving: false,
+            isSprinting: false,
+            hasShield: false,
+            activePowerups: [],
+            keys: {
+                up: false,
+                down: false,
+                left: false,
+                right: false,
+                sprint: false
+            }
+        };
+        
+        // Power-ups
+        let powerups = [];
+        let lastPowerupSpawn = 0;
+        
+        // Input State
+        let mouseX = CANVAS_WIDTH / 2;
+        let mouseY = CANVAS_HEIGHT / 2;
+        let mouseDown = false;
+        
+        // Effects
+        let revealEffectActive = false;
+        let revealEffectEndTime = 0;
+        let distortEffectActive = false;
+        let distortEffectEndTime = 0;
+        
+        // Audio Context for sound effects
+        let audioContext;
+        let sounds = {
+            shoot: null,
+            hit: null,
+            reload: null,
+            powerup: null
+        };
+
+        // Initialize Game
+        function init() {
+            // Initialize canvas with responsive size
+            resizeCanvas();
+            
+            // Initialize audio
+            initAudio();
+            
+            // Initialize ammo display
+            updateAmmoDisplay();
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Start game
+            startGame();
+        }
+        
+        function initAudio() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Create shoot sound
+                sounds.shoot = () => {
+                    if (!soundEnabled || !audioContext) return;
+                    
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 0.1);
+                    
+                    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                };
+                
+                // Create hit sound
+                sounds.hit = () => {
+                    if (!soundEnabled || !audioContext) return;
+                    
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.setValueAtTime(150, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.2);
+                    
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                };
+                
+                // Create powerup sound
+                sounds.powerup = () => {
+                    if (!soundEnabled || !audioContext) return;
+                    
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(300, audioContext.currentTime + 0.3);
+                    
+                    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                };
+            } catch (e) {
+                console.log("Audio not supported:", e);
+            }
+        }
+        
+        function setupEventListeners() {
+            // Mouse movement
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                mouseX = e.clientX - rect.left;
+                mouseY = e.clientY - rect.top;
+            });
+            
+            // Mouse click
+            canvas.addEventListener('mousedown', (e) => {
+                if (e.button === 0) { // Left click
+                    mouseDown = true;
+                    if (gameActive) {
+                        shoot();
+                    }
+                }
+            });
+            
+            canvas.addEventListener('mouseup', (e) => {
+                if (e.button === 0) {
+                    mouseDown = false;
+                }
+            });
+            
+            // Keyboard controls for hidden player - FIXED SCROLLING ISSUE
+            window.addEventListener('keydown', (e) => {
+                // Prevent default behavior for game control keys to stop page scrolling
+                if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " ", "w", "a", "s", "d", "W", "A", "S", "D"].includes(e.key)) {
+                    e.preventDefault();
+                }
+                
+                if (!gameActive) return;
+                
+                switch(e.key.toLowerCase()) {
+                    case 'arrowup':
+                    case 'w':
+                        hiddenPlayer.keys.up = true;
+                        break;
+                    case 'arrowdown':
+                    case 's':
+                        hiddenPlayer.keys.down = true;
+                        break;
+                    case 'arrowleft':
+                    case 'a':
+                        hiddenPlayer.keys.left = true;
+                        break;
+                    case 'arrowright':
+                    case 'd':
+                        hiddenPlayer.keys.right = true;
+                        break;
+                    case 'shift':
+                        hiddenPlayer.keys.sprint = true;
+                        break;
+                    case ' ':
+                        shoot();
+                        break;
+                    case 'r':
+                        if (sniper.ammo === 0) {
+                            reload();
+                        }
+                        break;
+                }
+                
+                updateHiddenPlayerMovement();
+            });
+            
+            window.addEventListener('keyup', (e) => {
+                // Prevent default behavior for game control keys
+                if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " ", "w", "a", "s", "d", "W", "A", "S", "D"].includes(e.key)) {
+                    e.preventDefault();
+                }
+                
+                switch(e.key.toLowerCase()) {
+                    case 'arrowup':
+                    case 'w':
+                        hiddenPlayer.keys.up = false;
+                        break;
+                    case 'arrowdown':
+                    case 's':
+                        hiddenPlayer.keys.down = false;
+                        break;
+                    case 'arrowleft':
+                    case 'a':
+                        hiddenPlayer.keys.left = false;
+                        break;
+                    case 'arrowright':
+                    case 'd':
+                        hiddenPlayer.keys.right = false;
+                        break;
+                    case 'shift':
+                        hiddenPlayer.keys.sprint = false;
+                        break;
+                }
+                
+                updateHiddenPlayerMovement();
+            });
+            
+            // Fullscreen functionality
+            fullscreenBtn.addEventListener('click', toggleFullscreen);
+            
+            // Exit fullscreen with ESC key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && isFullscreen) {
+                    exitFullscreen();
+                }
+            });
+            
+            // Fullscreen change event
+            document.addEventListener('fullscreenchange', handleFullscreenChange);
+            document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+            document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+            document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+            
+            // Instructions button
+            instructionsBtn.addEventListener('click', showInstructions);
+            
+            // Sound toggle
+            soundToggle.addEventListener('click', toggleSound);
+            
+            // Restart button
+            restartBtn.addEventListener('click', startGame);
+            
+            // Window resize
+            window.addEventListener('resize', handleResize);
+            
+            // Click to enable audio (required by browsers)
+            document.addEventListener('click', () => {
+                if (audioContext && audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+            });
+        }
+        
+        function updateHiddenPlayerMovement() {
+            hiddenPlayer.isMoving = 
+                hiddenPlayer.keys.up || 
+                hiddenPlayer.keys.down || 
+                hiddenPlayer.keys.left || 
+                hiddenPlayer.keys.right;
+            
+            hiddenPlayer.isSprinting = hiddenPlayer.keys.sprint && hiddenPlayer.isMoving;
+            
+            if (hiddenPlayer.isMoving) {
+                hiddenPlayer.lastMoveTime = Date.now();
+            }
+        }
+        
+        function startGame() {
+            // Reset game state
+            gameActive = true;
+            gameTime = GAME_DURATION;
+            
+            // Reset sniper
+            sniper.ammo = SNIPER_AMMO;
+            sniper.reloading = false;
+            sniper.recoil = 0;
+            sniper.activePowerups = [];
+            
+            // Reset hidden player
+            hiddenPlayer.x = CANVAS_WIDTH * 0.3;
+            hiddenPlayer.y = CANVAS_HEIGHT * 0.5;
+            hiddenPlayer.speed = HIDDEN_PLAYER_SPEED;
+            hiddenPlayer.visible = false;
+            hiddenPlayer.visibility = 0;
+            hiddenPlayer.lastMoveTime = 0;
+            hiddenPlayer.isMoving = false;
+            hiddenPlayer.isSprinting = false;
+            hiddenPlayer.hasShield = false;
+            hiddenPlayer.activePowerups = [];
+            
+            // Reset keys
+            hiddenPlayer.keys = {
+                up: false, down: false, left: false, right: false, sprint: false
+            };
+            
+            // Reset powerups
+            powerups = [];
+            lastPowerupSpawn = Date.now();
+            
+            // Reset effects
+            revealEffectActive = false;
+            distortEffectActive = false;
+            
+            // Update UI
+            updateAmmoDisplay();
+            gameMessage.style.display = 'none';
+            fullscreenWarning.style.display = 'none';
+            
+            // Start game loop
+            lastTime = Date.now();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        function gameLoop() {
+            if (!gameActive) return;
+            
+            const currentTime = Date.now();
+            const deltaTime = (currentTime - lastTime) / 1000; // Convert to seconds
+            lastTime = currentTime;
+            
+            // Update game time
+            gameTime -= deltaTime;
+            if (gameTime <= 0) {
+                gameTime = 0;
+                hiddenPlayerWins();
+            }
+            
+            // Update UI
+            updateUI();
+            
+            // Update game objects
+            updateHiddenPlayer(deltaTime);
+            updateSniper();
+            updatePowerups(currentTime);
+            spawnPowerups(currentTime);
+            updateEffects(currentTime);
+            
+            // Draw everything
+            draw();
+            
+            // Continue game loop
+            requestAnimationFrame(gameLoop);
+        }
+        
+        function updateUI() {
+            // Update timer
+            gameTimer.textContent = gameTime.toFixed(1);
+            
+            // Update ammo display
+            ammoCount.textContent = `${sniper.ammo}/${sniper.maxAmmo}`;
+            updateAmmoDisplay();
+            
+            // Update visibility
+            const visPercent = Math.min(100, Math.round(hiddenPlayer.visibility * 100));
+            visibilityLevel.textContent = `${visPercent}%`;
+            
+            // Update speed
+            const speedPercent = Math.round((hiddenPlayer.speed / HIDDEN_PLAYER_SPEED) * 100);
+            speedLevel.textContent = `${speedPercent}%`;
+            
+            // Update powerup counts
+            sniperPowerups.textContent = sniper.activePowerups.length;
+            hiddenPowerups.textContent = hiddenPlayer.activePowerups.length;
+        }
+        
+        function updateAmmoDisplay() {
+            ammoDisplay.innerHTML = '';
+            for (let i = 0; i < sniper.maxAmmo; i++) {
+                const bullet = document.createElement('div');
+                bullet.className = `ammo-bullet ${i < sniper.ammo ? 'loaded' : ''}`;
+                ammoDisplay.appendChild(bullet);
+            }
+        }
+        
+        function updateHiddenPlayer(deltaTime) {
+            // Calculate movement
+            let moveX = 0;
+            let moveY = 0;
+            
+            if (hiddenPlayer.keys.up && hiddenPlayer.y - hiddenPlayer.radius > 0) {
+                moveY -= 1;
+            }
+            if (hiddenPlayer.keys.down && hiddenPlayer.y + hiddenPlayer.radius < canvas.height) {
+                moveY += 1;
+            }
+            if (hiddenPlayer.keys.left && hiddenPlayer.x - hiddenPlayer.radius > 0) {
+                moveX -= 1;
+            }
+            if (hiddenPlayer.keys.right && hiddenPlayer.x + hiddenPlayer.radius < canvas.width) {
+                moveX += 1;
+            }
+            
+            // Normalize diagonal movement
+            if (moveX !== 0 && moveY !== 0) {
+                moveX *= 0.7071; // 1/√2
+                moveY *= 0.7071;
+            }
+            
+            // Apply movement
+            const currentSpeed = hiddenPlayer.isSprinting ? HIDDEN_PLAYER_SPRINT_SPEED : hiddenPlayer.speed;
+            hiddenPlayer.x += moveX * currentSpeed;
+            hiddenPlayer.y += moveY * currentSpeed;
+            
+            // Keep player in bounds
+            hiddenPlayer.x = Math.max(hiddenPlayer.radius, Math.min(canvas.width - hiddenPlayer.radius, hiddenPlayer.x));
+            hiddenPlayer.y = Math.max(hiddenPlayer.radius, Math.min(canvas.height - hiddenPlayer.radius, hiddenPlayer.y));
+            
+            // Update visibility based on movement
+            const timeSinceMove = Date.now() - hiddenPlayer.lastMoveTime;
+            
+            if (hiddenPlayer.isMoving) {
+                // Increase visibility when moving
+                hiddenPlayer.visibility += deltaTime * (hiddenPlayer.isSprinting ? 0.4 : 0.2);
+                hiddenPlayer.visibility = Math.min(1, hiddenPlayer.visibility);
+                hiddenPlayer.visible = true;
+            } else {
+                // Decrease visibility when stationary
+                hiddenPlayer.visibility -= deltaTime * 0.3;
+                hiddenPlayer.visibility = Math.max(0, hiddenPlayer.visibility);
+                
+                // Become invisible after a short time
+                if (timeSinceMove > 1000) {
+                    hiddenPlayer.visible = false;
+                }
+            }
+            
+            // Force visibility during reveal effect
+            if (revealEffectActive) {
+                hiddenPlayer.visible = true;
+                hiddenPlayer.visibility = 1;
+            }
+        }
+        
+        function updateSniper() {
+            // Update recoil
+            if (sniper.recoil > 0) {
+                sniper.recoil -= 0.1;
+                if (sniper.recoil < 0) sniper.recoil = 0;
+            }
+            
+            // Update crosshair position based on mouse
+            sniper.x = mouseX;
+            sniper.y = mouseY;
+        }
+        
+        function updatePowerups(currentTime) {
+            // Update powerup lifetimes
+            for (let i = powerups.length - 1; i >= 0; i--) {
+                powerups[i].lifetime -= currentTime - lastTime;
+                
+                // Remove expired powerups
+                if (powerups[i].lifetime <= 0) {
+                    powerups.splice(i, 1);
+                }
+            }
+            
+            // Check for collisions with hidden player
+            for (let i = powerups.length - 1; i >= 0; i--) {
+                const p = powerups[i];
+                const dx = hiddenPlayer.x - p.x;
+                const dy = hiddenPlayer.y - p.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < hiddenPlayer.radius + POWERUP_RADIUS) {
+                    collectPowerup(p, 'hidden');
+                    powerups.splice(i, 1);
+                }
+            }
+            
+            // Check for collisions with sniper (crosshair)
+            if (sniper.ammo > 0) { // Only if sniper has ammo
+                for (let i = powerups.length - 1; i >= 0; i--) {
+                    const p = powerups[i];
+                    if (p.type === 'sniper') {
+                        const dx = sniper.x - p.x;
+                        const dy = sniper.y - p.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < sniper.crosshairSize + POWERUP_RADIUS) {
+                            collectPowerup(p, 'sniper');
+                            powerups.splice(i, 1);
+                        }
+                    }
+                }
+            }
+        }
+        
+        function spawnPowerups(currentTime) {
+            if (currentTime - lastPowerupSpawn > POWERUP_SPAWN_INTERVAL) {
+                // Spawn a random powerup
+                const powerupKeys = Object.keys(POWERUP_TYPES);
+                const randomPowerupKey = powerupKeys[Math.floor(Math.random() * powerupKeys.length)];
+                const powerupType = POWERUP_TYPES[randomPowerupKey];
+                
+                // Random position (avoid center and edges)
+                const x = 50 + Math.random() * (canvas.width - 100);
+                const y = 50 + Math.random() * (canvas.height - 100);
+                
+                powerups.push({
+                    x: x,
+                    y: y,
+                    type: powerupType.type,
+                    color: powerupType.color,
+                    shape: powerupType.shape,
+                    effect: powerupType.effect,
+                    lifetime: POWERUP_LIFETIME
+                });
+                
+                lastPowerupSpawn = currentTime;
+            }
+        }
+        
+        function collectPowerup(powerup, collector) {
+            const now = Date.now();
+            
+            // Play sound effect
+            if (sounds.powerup) {
+                sounds.powerup();
+            }
+            
+            if (collector === 'sniper') {
+                switch(powerup.effect) {
+                    case 'ammo':
+                        sniper.ammo = Math.min(sniper.maxAmmo, sniper.ammo + 3);
+                        sniper.activePowerups.push({ effect: 'ammo', endTime: now + 1000 });
+                        break;
+                    case 'reveal':
+                        revealEffectActive = true;
+                        revealEffectEndTime = now + 1500;
+                        sniper.activePowerups.push({ effect: 'reveal', endTime: revealEffectEndTime });
+                        break;
+                    case 'slow':
+                        hiddenPlayer.speed = HIDDEN_PLAYER_SPEED * 0.5;
+                        sniper.activePowerups.push({ effect: 'slow', endTime: now + 2000 });
+                        break;
+                }
+            } else { // hidden player
+                switch(powerup.effect) {
+                    case 'speed':
+                        hiddenPlayer.speed = HIDDEN_PLAYER_SPEED * 1.5;
+                        hiddenPlayer.activePowerups.push({ effect: 'speed', endTime: now + 3000 });
+                        break;
+                    case 'shield':
+                        hiddenPlayer.hasShield = true;
+                        hiddenPlayer.activePowerups.push({ effect: 'shield', endTime: now + 30000 }); // Lasts 30s or until hit
+                        break;
+                    case 'distort':
+                        distortEffectActive = true;
+                        distortEffectEndTime = now + 5000;
+                        hiddenPlayer.activePowerups.push({ effect: 'distort', endTime: distortEffectEndTime });
+                        break;
+                }
+            }
+        }
+        
+        function updateEffects(currentTime) {
+            // Update sniper powerups
+            for (let i = sniper.activePowerups.length - 1; i >= 0; i--) {
+                if (currentTime > sniper.activePowerups[i].endTime) {
+                    const effect = sniper.activePowerups[i].effect;
+                    sniper.activePowerups.splice(i, 1);
+                    
+                    // Remove effect
+                    if (effect === 'slow') {
+                        hiddenPlayer.speed = HIDDEN_PLAYER_SPEED;
+                    }
+                }
+            }
+            
+            // Update hidden player powerups
+            for (let i = hiddenPlayer.activePowerups.length - 1; i >= 0; i--) {
+                if (currentTime > hiddenPlayer.activePowerups[i].endTime) {
+                    const effect = hiddenPlayer.activePowerups[i].effect;
+                    hiddenPlayer.activePowerups.splice(i, 1);
+                    
+                    // Remove effect
+                    if (effect === 'speed') {
+                        hiddenPlayer.speed = HIDDEN_PLAYER_SPEED;
+                    } else if (effect === 'shield') {
+                        hiddenPlayer.hasShield = false;
+                    }
+                }
+            }
+            
+            // Update reveal effect
+            if (revealEffectActive && currentTime > revealEffectEndTime) {
+                revealEffectActive = false;
+            }
+            
+            // Update distort effect
+            if (distortEffectActive && currentTime > distortEffectEndTime) {
+                distortEffectActive = false;
+            }
+        }
+        
+        function shoot() {
+            if (sniper.ammo <= 0 || sniper.reloading || !gameActive) return;
+            
+            // Use ammo
+            sniper.ammo--;
+            
+            // Apply recoil
+            sniper.recoil = 1;
+            
+            // Play shoot sound
+            if (sounds.shoot) {
+                sounds.shoot();
+            }
+            
+            // Check for hit
+            const dx = hiddenPlayer.x - sniper.x;
+            const dy = hiddenPlayer.y - sniper.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < hiddenPlayer.radius + sniper.crosshairSize) {
+                // Hit!
+                if (hiddenPlayer.hasShield) {
+                    // Shield blocks the shot
+                    hiddenPlayer.hasShield = false;
+                    
+                    // Play hit sound
+                    if (sounds.hit) {
+                        sounds.hit();
+                    }
+                    
+                    // Remove shield powerup
+                    for (let i = hiddenPlayer.activePowerups.length - 1; i >= 0; i--) {
+                        if (hiddenPlayer.activePowerups[i].effect === 'shield') {
+                            hiddenPlayer.activePowerups.splice(i, 1);
+                            break;
+                        }
+                    }
+                } else {
+                    // Play hit sound
+                    if (sounds.hit) {
+                        sounds.hit();
+                    }
+                    // Sniper wins
+                    sniperWins();
+                }
+            }
+            
+            // Auto-reload if empty
+            if (sniper.ammo === 0) {
+                reload();
+            }
+            
+            updateAmmoDisplay();
+        }
+        
+        function reload() {
+            if (sniper.reloading || sniper.ammo === sniper.maxAmmo) return;
+            
+            sniper.reloading = true;
+            
+            // Simulate reload time
+            setTimeout(() => {
+                sniper.ammo = sniper.maxAmmo;
+                sniper.reloading = false;
+                updateAmmoDisplay();
+            }, 1000);
+        }
+        
+        function sniperWins() {
+            gameActive = false;
+            messageTitle.textContent = 'SNIPER WINS!';
+            messageTitle.style.color = '#ff6b6b';
+            messageSubtitle.textContent = 'The hidden player was eliminated';
+            gameMessage.style.display = 'block';
+            if (!isFullscreen) {
+                fullscreenWarning.style.display = 'block';
+            }
+        }
+        
+        function hiddenPlayerWins() {
+            gameActive = false;
+            messageTitle.textContent = 'HIDDEN PLAYER WINS!';
+            messageTitle.style.color = '#4dffb8';
+            messageSubtitle.textContent = '60 seconds survived';
+            gameMessage.style.display = 'block';
+            if (!isFullscreen) {
+                fullscreenWarning.style.display = 'block';
+            }
+        }
+        
+        function draw() {
+            // Clear canvas with dark background
+            ctx.fillStyle = '#111122';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw grid pattern for visual reference
+            drawGrid();
+            
+            // Draw powerups
+            drawPowerups();
+            
+            // Draw hidden player
+            drawHiddenPlayer();
+            
+            // Draw sniper crosshair
+            drawSniperCrosshair();
+            
+            // Draw effects
+            if (revealEffectActive) {
+                drawRevealEffect();
+            }
+        }
+        
+        function drawGrid() {
+            ctx.strokeStyle = '#1a1a33';
+            ctx.lineWidth = 1;
+            
+            // Vertical lines
+            const gridSize = canvas.width > 800 ? 50 : 30;
+            for (let x = 0; x <= canvas.width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            
+            // Horizontal lines
+            for (let y = 0; y <= canvas.height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+        }
+        
+        function drawHiddenPlayer() {
+            if (!hiddenPlayer.visible && !revealEffectActive) return;
+            
+            // Calculate opacity based on visibility
+            const opacity = revealEffectActive ? 1 : hiddenPlayer.visibility;
+            
+            // Draw shadow/aura
+            ctx.beginPath();
+            ctx.arc(hiddenPlayer.x, hiddenPlayer.y, hiddenPlayer.radius + 10, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(77, 255, 184, ${0.2 * opacity})`;
+            ctx.fill();
+            
+            // Draw player circle
+            ctx.beginPath();
+            ctx.arc(hiddenPlayer.x, hiddenPlayer.y, hiddenPlayer.radius, 0, Math.PI * 2);
+            
+            // Gradient fill
+            const gradient = ctx.createRadialGradient(
+                hiddenPlayer.x, hiddenPlayer.y, 0,
+                hiddenPlayer.x, hiddenPlayer.y, hiddenPlayer.radius
+            );
+            gradient.addColorStop(0, `rgba(77, 255, 184, ${0.8 * opacity})`);
+            gradient.addColorStop(1, `rgba(77, 255, 184, ${0.2 * opacity})`);
+            
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            
+            // Draw shield if active
+            if (hiddenPlayer.hasShield) {
+                ctx.beginPath();
+                ctx.arc(hiddenPlayer.x, hiddenPlayer.y, hiddenPlayer.radius + 5, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(255, 221, 89, ${0.7 * opacity})`;
+                ctx.lineWidth = 3;
+                ctx.setLineDash([5, 5]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+            
+            // Draw sprint effect
+            if (hiddenPlayer.isSprinting) {
+                ctx.beginPath();
+                ctx.arc(hiddenPlayer.x, hiddenPlayer.y, hiddenPlayer.radius + 15, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(77, 255, 184, ${0.5 * opacity})`;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        }
+        
+        function drawSniperCrosshair() {
+            // Apply distortion effect
+            let offsetX = 0;
+            let offsetY = 0;
+            
+            if (distortEffectActive) {
+                offsetX = (Math.random() - 0.5) * 20;
+                offsetY = (Math.random() - 0.5) * 20;
+            }
+            
+            const centerX = sniper.x + offsetX + (Math.random() - 0.5) * sniper.recoil * 5;
+            const centerY = sniper.y + offsetY + (Math.random() - 0.5) * sniper.recoil * 5;
+            const size = Math.max(15, Math.min(25, sniper.crosshairSize * (canvas.width / CANVAS_WIDTH)));
+            
+            // Outer glow
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, size + 5, 0, Math.PI * 2);
+            const glowGradient = ctx.createRadialGradient(
+                centerX, centerY, size,
+                centerX, centerY, size + 5
+            );
+            glowGradient.addColorStop(0, 'rgba(255, 107, 107, 0.8)');
+            glowGradient.addColorStop(1, 'rgba(255, 107, 107, 0)');
+            ctx.fillStyle = glowGradient;
+            ctx.fill();
+            
+            // Crosshair lines
+            ctx.strokeStyle = '#ff6b6b';
+            ctx.lineWidth = 2;
+            
+            // Horizontal line
+            ctx.beginPath();
+            ctx.moveTo(centerX - size, centerY);
+            ctx.lineTo(centerX + size, centerY);
+            ctx.stroke();
+            
+            // Vertical line
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY - size);
+            ctx.lineTo(centerX, centerY + size);
+            ctx.stroke();
+            
+            // Inner circle
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
+            ctx.fillStyle = '#ff6b6b';
+            ctx.fill();
+            
+            // Ammo indicator
+            if (sniper.ammo === 0) {
+                ctx.fillStyle = 'rgba(255, 107, 107, 0.7)';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('RELOADING...', centerX, centerY - size - 15);
+            }
+        }
+        
+        function drawPowerups() {
+            const now = Date.now();
+            
+            for (const p of powerups) {
+                // Calculate pulse effect
+                const pulse = Math.sin(now * 0.005) * 0.2 + 0.8;
+                const radius = Math.max(10, Math.min(20, POWERUP_RADIUS * (canvas.width / CANVAS_WIDTH)));
+                
+                // Draw outer glow
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, radius + 3, 0, Math.PI * 2);
+                ctx.fillStyle = `${p.color}20`; // 20 = 12.5% opacity in hex
+                ctx.fill();
+                
+                // Draw powerup shape
+                ctx.fillStyle = p.color;
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                
+                switch(p.shape) {
+                    case 'circle':
+                        ctx.beginPath();
+                        ctx.arc(0, 0, radius * pulse, 0, Math.PI * 2);
+                        ctx.fill();
+                        break;
+                        
+                    case 'square':
+                        ctx.beginPath();
+                        ctx.rect(-radius * pulse, -radius * pulse, 
+                                radius * 2 * pulse, radius * 2 * pulse);
+                        ctx.fill();
+                        break;
+                        
+                    case 'triangle':
+                        ctx.beginPath();
+                        ctx.moveTo(0, -radius * pulse);
+                        ctx.lineTo(radius * pulse, radius * pulse);
+                        ctx.lineTo(-radius * pulse, radius * pulse);
+                        ctx.closePath();
+                        ctx.fill();
+                        break;
+                        
+                    case 'hexagon':
+                        ctx.beginPath();
+                        for (let i = 0; i < 6; i++) {
+                            const angle = (i * Math.PI) / 3;
+                            const x = Math.cos(angle) * radius * pulse;
+                            const y = Math.sin(angle) * radius * pulse;
+                            if (i === 0) ctx.moveTo(x, y);
+                            else ctx.lineTo(x, y);
+                        }
+                        ctx.closePath();
+                        ctx.fill();
+                        break;
+                        
+                    case 'star':
+                        ctx.beginPath();
+                        for (let i = 0; i < 10; i++) {
+                            const angle = (i * Math.PI) / 5;
+                            const starRadius = i % 2 === 0 ? radius * pulse : radius * 0.5 * pulse;
+                            const x = Math.cos(angle) * starRadius;
+                            const y = Math.sin(angle) * starRadius;
+                            if (i === 0) ctx.moveTo(x, y);
+                            else ctx.lineTo(x, y);
+                        }
+                        ctx.closePath();
+                        ctx.fill();
+                        break;
+                }
+                
+                ctx.restore();
+                
+                // Draw type indicator
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(p.type === 'sniper' ? 'S' : 'H', p.x, p.y + 4);
+            }
+        }
+        
+        function drawRevealEffect() {
+            // Create a pulsing reveal circle
+            const pulse = (Math.sin(Date.now() * 0.01) + 1) * 0.5;
+            const radius = 100 + pulse * 50;
+            
+            // Radial gradient for reveal effect
+            const gradient = ctx.createRadialGradient(
+                hiddenPlayer.x, hiddenPlayer.y, 0,
+                hiddenPlayer.x, hiddenPlayer.y, radius
+            );
+            gradient.addColorStop(0, 'rgba(110, 231, 255, 0.3)');
+            gradient.addColorStop(1, 'rgba(110, 231, 255, 0)');
+            
+            ctx.beginPath();
+            ctx.arc(hiddenPlayer.x, hiddenPlayer.y, radius, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            
+            // Text indicator
+            ctx.fillStyle = '#6ee7ff';
+            ctx.font = 'bold 14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('REVEALED!', hiddenPlayer.x, hiddenPlayer.y - hiddenPlayer.radius - 20);
+        }
+        
+        // Fullscreen functionality
+        function toggleFullscreen() {
+            if (!isFullscreen) {
+                enterFullscreen();
+            } else {
+                exitFullscreen();
+            }
+        }
+        
+        function enterFullscreen() {
+            if (gameArea.requestFullscreen) {
+                gameArea.requestFullscreen();
+            } else if (gameArea.webkitRequestFullscreen) {
+                gameArea.webkitRequestFullscreen();
+            } else if (gameArea.mozRequestFullScreen) {
+                gameArea.mozRequestFullScreen();
+            } else if (gameArea.msRequestFullscreen) {
+                gameArea.msRequestFullscreen();
+            }
+        }
+        
+        function exitFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
+        
+        function handleFullscreenChange() {
+            isFullscreen = !!(document.fullscreenElement || 
+                            document.webkitFullscreenElement || 
+                            document.mozFullScreenElement || 
+                            document.msFullscreenElement);
+            
+            if (isFullscreen) {
+                gameArea.classList.add('fullscreen');
+                fullscreenText.textContent = 'EXIT FULL SCREEN';
+                resizeCanvas();
+            } else {
+                gameArea.classList.remove('fullscreen');
+                fullscreenText.textContent = 'FULL SCREEN';
+                resizeCanvas();
+            }
+        }
+        
+        function resizeCanvas() {
+            const container = gameArea;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            
+            // Adjust game elements for new canvas size
+            if (!isFullscreen) {
+                // Scale hidden player position proportionally
+                const scaleX = canvas.width / CANVAS_WIDTH;
+                const scaleY = canvas.height / CANVAS_HEIGHT;
+                
+                hiddenPlayer.x = hiddenPlayer.x * scaleX;
+                hiddenPlayer.y = hiddenPlayer.y * scaleY;
+                
+                // Scale powerup positions
+                for (const p of powerups) {
+                    p.x = p.x * scaleX;
+                    p.y = p.y * scaleY;
+                }
+                
+                // Update sniper position
+                sniper.x = mouseX;
+                sniper.y = mouseY;
+            }
+        }
+        
+        function handleResize() {
+            resizeCanvas();
+        }
+        
+        function showInstructions() {
+            alert(`SHADOW DUEL - HOW TO PLAY
+
+🎯 SNIPER (Player 1):
+- Move mouse to aim
+- LEFT CLICK or SPACE to shoot
+- R to reload when out of ammo
+- Collect blue power-ups by hovering crosshair
+
+👻 HIDDEN PLAYER (Player 2):
+- ARROW KEYS or WASD to move
+- SHIFT to sprint (but become more visible)
+- Collect green power-ups by touching them
+
+🎮 GAME RULES:
+- Sniper wins by hitting the hidden player
+- Hidden player wins by surviving 60 seconds
+- Hidden player is invisible when standing still
+- Power-ups spawn randomly every 5 seconds
+
+💡 PRO TIPS:
+- Sniper: Conserve ammo and wait for good shots
+- Hidden: Move unpredictably and use cover
+- Both: Collect power-ups for advantages
+
+Press ESC to exit fullscreen mode`);
+        }
+        
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            soundToggle.innerHTML = soundEnabled ? 
+                '<span>🔊</span> SOUND: ON' : 
+                '<span>🔇</span> SOUND: OFF';
+        }
+        
+        // Initialize the game when page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

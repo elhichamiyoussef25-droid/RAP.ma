@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تواصل معنا | Local Party Games</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --whatsapp: #25D366;
+            --instagram: #E1306C;
+            --gmail: #EA4335;
+            --primary: #6ee7ff;
+            --secondary: #4dffb8;
+            --accent: #ff6b6b;
+            --bg-main: #0b0f1a;
+            --bg-glass: rgba(255, 255, 255, 0.08);
+            --border-glass: rgba(255, 255, 255, 0.18);
+            --text-main: #e6e6ff;
+            --text-muted: #9aa0c3;
+        }
+
+        body {
+            background: radial-gradient(circle at top, #121a3a, var(--bg-main));
+            color: var(--text-main);
+            font-family: "Segoe UI", "Tajawal", system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, var(--accent), #ff4757);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            z-index: 100;
+            font-size: 1rem;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .contact-header {
+            text-align: center;
+            padding: 60px 20px 40px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .contact-header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(110, 231, 255, 0.3);
+        }
+
+        .contact-header .subtitle {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            max-width: 800px;
+            margin: 0 auto 30px;
+            line-height: 1.6;
+        }
+
+        .message-box {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px auto;
+            max-width: 800px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            border-top: 4px solid var(--primary);
+        }
+
+        .message-box h2 {
+            font-size: 2.2rem;
+            margin-bottom: 25px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .message-box p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        .message-box .highlight {
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 1.3rem;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(110, 231, 255, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(110, 231, 255, 0.2);
+        }
+
+        .contact-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+        }
+
+        .contact-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-15px) scale(1.03);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        .contact-card.whatsapp {
+            border-top: 4px solid var(--whatsapp);
+        }
+
+        .contact-card.instagram {
+            border-top: 4px solid var(--instagram);
+        }
+
+        .contact-card.email {
+            border-top: 4px solid var(--gmail);
+        }
+
+        .contact-icon {
+            font-size: 4rem;
+            margin-bottom: 25px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .contact-card.whatsapp .contact-icon {
+            color: var(--whatsapp);
+            text-shadow: 0 0 20px rgba(37, 211, 102, 0.3);
+        }
+
+        .contact-card.instagram .contact-icon {
+            color: var(--instagram);
+            text-shadow: 0 0 20px rgba(225, 48, 108, 0.3);
+        }
+
+        .contact-card.email .contact-icon {
+            color: var(--gmail);
+            text-shadow: 0 0 20px rgba(234, 67, 53, 0.3);
+        }
+
+        .contact-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--text-main);
+        }
+
+        .contact-info {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin: 20px 0;
+            word-break: break-word;
+        }
+
+        .contact-card.whatsapp .contact-info {
+            color: var(--whatsapp);
+            font-size: 1.5rem;
+        }
+
+        .contact-card.instagram .contact-info {
+            color: var(--instagram);
+        }
+
+        .contact-card.email .contact-info {
+            color: var(--gmail);
+        }
+
+        .contact-description {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-top: 15px;
+        }
+
+        .contact-btn {
+            margin-top: 25px;
+            padding: 14px 30px;
+            border-radius: 12px;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            text-decoration: none;
+        }
+
+        .contact-card.whatsapp .contact-btn {
+            background: linear-gradient(135deg, var(--whatsapp), #128C7E);
+            color: white;
+        }
+
+        .contact-card.instagram .contact-btn {
+            background: linear-gradient(45deg, #405DE6, #833AB4, #E1306C, #FCAF45);
+            color: white;
+        }
+
+        .contact-card.email .contact-btn {
+            background: linear-gradient(135deg, var(--gmail), #C5221F);
+            color: white;
+        }
+
+        .contact-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* زر الإعلان الجديد */
+        .ad-button {
+            margin: 40px auto;
+            text-align: center;
+        }
+
+        .ad-btn {
+            background: linear-gradient(135deg, #FF9800, #FF5722);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            text-decoration: none;
+            box-shadow: 0 10px 30px rgba(255, 152, 0, 0.3);
+            animation: pulse 2s infinite;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ad-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .ad-btn:hover::before {
+            left: 100%;
+        }
+
+        .ad-btn:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(255, 152, 0, 0.5);
+        }
+
+        .ad-btn:active {
+            transform: translateY(-4px) scale(1.02);
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(255, 152, 0, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 152, 0, 0);
+            }
+        }
+
+        .ad-btn i {
+            font-size: 1.5rem;
+        }
+
+        .ai-assistance {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 60px auto;
+            max-width: 900px;
+            text-align: center;
+            border-left: 4px solid var(--secondary);
+            border-right: 4px solid var(--primary);
+        }
+
+        .ai-assistance h2 {
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .ai-platforms {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin: 40px 0;
+        }
+
+        .ai-platform {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 30px;
+            min-width: 200px;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .ai-platform:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary);
+        }
+
+        .ai-platform.deepseek {
+            border-top: 4px solid var(--primary);
+        }
+
+        .ai-platform.chatgpt {
+            border-top: 4px solid #10a37f;
+        }
+
+        .ai-platform i {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .ai-platform.deepseek i {
+            color: var(--primary);
+        }
+
+        .ai-platform.chatgpt i {
+            color: #10a37f;
+        }
+
+        .ai-platform h4 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--text-main);
+        }
+
+        .ai-platform p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .footer-message {
+            text-align: center;
+            padding: 60px 20px;
+            margin-top: 60px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer-message h3 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .footer-text {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.8;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .success-code {
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 30px auto;
+            max-width: 600px;
+            font-size: 1.2rem;
+            color: var(--secondary);
+            border: 1px solid rgba(77, 255, 184, 0.3);
+            text-align: left;
+            direction: ltr;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .floating-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animated {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @media (max-width: 768px) {
+            .contact-header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .contact-methods {
+                grid-template-columns: 1fr;
+            }
+            
+            .contact-card {
+                min-height: 250px;
+            }
+            
+            .ai-platforms {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .ai-platform {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .message-box {
+                padding: 30px 20px;
+            }
+            
+            .footer-text {
+                padding: 20px;
+                font-size: 1.1rem;
+            }
+            
+            .ad-btn {
+                padding: 14px 30px;
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .contact-header h1 {
+                font-size: 2rem;
+            }
+            
+            .contact-card {
+                padding: 25px 20px;
+            }
+            
+            .contact-icon {
+                font-size: 3rem;
+                height: 80px;
+            }
+            
+            .back-btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .ad-btn {
+                padding: 12px 25px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <button class="back-btn" onclick="window.location.href='home.html'">
+        <i class="fas fa-arrow-left"></i>
+        العودة
+    </button>
+
+    <div class="container">
+        <div class="contact-header animated">
+            <h1><i class="fas fa-handshake"></i> تواصل معنا</h1>
+            <p class="subtitle">
+                هل لديك لعبة مميزة تريد عرضها على موقعنا؟ تواصل معنا عبر أي من الطرق التالية
+            </p>
+        </div>
+
+        <div class="message-box animated">
+            <h2><i class="fas fa-bullhorn"></i> رسالة خاصة إلى المطورين</h2>
+            <p>
+                "إلى كل من يرغب في تشريفنا بوضع ألعابه في موقعنا يتواصل معي.<br>
+                يمكنكم استخدام DeepSeek و ChatGPT وبرمجة لعبة، أفضل نشكركم على وقتكم.<br>
+                وإن تشجع لكم إذا حصل موقع على رواج وزوار فسندفع لكم على كل استخدام للعبة إن شاء الله."
+            </p>
+            <div class="highlight">
+                <i class="fas fa-heart"></i> شكراً لكل المبدعين والمطورين
+            </div>
+        </div>
+
+        <!-- زر الإعلان الجديد -->
+        <div class="ad-button animated">
+            <a href="https://www.effectivegatecpm.com/yz78ip192?key=5e01ac41119a7a0252684e35b5e7b98b" 
+               target="_blank" 
+               class="ad-btn">
+                <i class="fas fa-gem"></i>
+                اكتشف عروض خاصة
+            </a>
+            <p style="color: var(--text-muted); margin-top: 15px; font-size: 0.95rem;">
+                اضغط على الزر للوصول إلى عروض حصرية وخدمات مميزة
+            </p>
+        </div>
+
+        <div class="contact-methods">
+            <!-- بطاقة واتساب -->
+            <div class="contact-card whatsapp animated">
+                <div class="contact-icon floating-icon">
+                    <i class="fab fa-whatsapp"></i>
+                </div>
+                <h3>واتساب</h3>
+                <div class="contact-info">+212 721-621860</div>
+                <p class="contact-description">
+                    تواصل مباشر وسريع عبر واتساب<br>
+                    مناسب للمناقشات السريعة والمشاريع العاجلة
+                </p>
+                <a href="https://wa.me/212721621860" target="_blank" class="contact-btn">
+                    <i class="fab fa-whatsapp"></i>
+                    ابدأ محادثة
+                </a>
+            </div>
+
+            <!-- بطاقة إنستغرام -->
+            <div class="contact-card instagram animated" style="animation-delay: 0.2s;">
+                <div class="contact-icon floating-icon">
+                    <i class="fab fa-instagram"></i>
+                </div>
+                <h3>إنستغرام</h3>
+                <div class="contact-info">@wmcskai</div>
+                <p class="contact-description">
+                    تابعنا لمعرفة آخر التحديثات<br>
+                    وشاهد ألعاب المطورين الآخرين
+                </p>
+                <a href="https://instagram.com/wmcskai" target="_blank" class="contact-btn">
+                    <i class="fab fa-instagram"></i>
+                    تابع على إنستغرام
+                </a>
+            </div>
+
+            <!-- بطاقة البريد الإلكتروني -->
+            <div class="contact-card email animated" style="animation-delay: 0.4s;">
+                <div class="contact-icon floating-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <h3>البريد الإلكتروني</h3>
+                <div class="contact-info">elhichamiyoussef25@gmail.com</div>
+                <p class="contact-description">
+                    لإرسال الألعاب والاستفسارات الرسمية<br>
+                    ومتابعة المشاريع الطويلة المدى
+                </p>
+                <a href="mailto:elhichamiyoussef25@gmail.com?subject=طلب رفع لعبة جديدة&body=مرحباً، أود رفع لعبة جديدة على موقعكم" 
+                   target="_blank" class="contact-btn">
+                    <i class="fas fa-paper-plane"></i>
+                    أرسل بريداً
+                </a>
+            </div>
+        </div>
+
+        <div class="ai-assistance animated">
+            <h2><i class="fas fa-robot"></i> مساعدات الذكاء الاصطناعي</h2>
+            <p style="color: var(--text-muted); font-size: 1.2rem; margin-bottom: 30px;">
+                يمكنك استخدام هذه الأدوات المساعدة في برمجة ألعابك:
+            </p>
+            
+            <div class="ai-platforms">
+                <div class="ai-platform deepseek">
+                    <i class="fas fa-brain"></i>
+                    <h4>DeepSeek</h4>
+                    <p>مساعد ذكي مجاني يساعد في كتابة الأكواد وحل المشاكل البرمجية</p>
+                </div>
+                
+                <div class="ai-platform chatgpt">
+                    <i class="fas fa-robot"></i>
+                    <h4>ChatGPT</h4>
+                    <p>مساعد متقدم للبرمجة والإبداع في تصميم الألعاب</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-message animated">
+            <h3><i class="fas fa-code"></i> رسالة من القلب</h3>
+            <div class="footer-text">
+                "نحن هنا لدعم المبدعين والمطورين. كل لعبة تضيفها تجعل الموقع أكثر حيوية.<br>
+                إذا نجح الموقع، سيكون هناك تعويض مناسب لكل مطور حسب نجاح لعبتهم.<br>
+                معاً نبني مجتمعاً للألعاب المحلية المميزة!"
+            </div>
+            
+            <div class="success-code">
+                <span style="color: var(--primary);">print</span>(<span style="color: var(--secondary);">"يوم سعيد"</span>)<br>
+                <span style="color: #888; font-style: italic;"># رمز النجاح لكل مطور</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // إضافة تأثيرات تفاعلية
+        document.addEventListener('DOMContentLoaded', function() {
+            // إضافة تأثيرات للبطاقات عند التمرير
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animated');
+                    }
+                });
+            }, observerOptions);
+
+            // مراقبة جميع العناصر المتحركة
+            document.querySelectorAll('.contact-card, .ai-platform, .message-box, .ad-button').forEach(el => {
+                observer.observe(el);
+            });
+
+            // تأثير النسخ للنص
+            const contactInfo = document.querySelectorAll('.contact-info');
+            contactInfo.forEach(info => {
+                info.addEventListener('click', function() {
+                    const text = this.textContent.trim();
+                    navigator.clipboard.writeText(text).then(() => {
+                        const original = this.textContent;
+                        this.textContent = 'تم النسخ! ✓';
+                        this.style.color = 'var(--secondary)';
+                        
+                        setTimeout(() => {
+                            this.textContent = original;
+                            this.style.color = '';
+                        }, 2000);
+                    });
+                });
+                
+                info.style.cursor = 'pointer';
+                info.title = 'انقر للنسخ';
+            });
+
+            // تأثير خاص لزر الإعلان
+            const adBtn = document.querySelector('.ad-btn');
+            if (adBtn) {
+                adBtn.addEventListener('mouseenter', function() {
+                    this.style.animation = 'none';
+                    setTimeout(() => {
+                        this.style.animation = 'pulse 2s infinite';
+                    }, 10);
+                });
+
+                // تتبع النقرات على زر الإعلان (اختياري)
+                adBtn.addEventListener('click', function() {
+                    console.log('تم النقر على زر الإعلان');
+                    // يمكنك إضافة Google Analytics أو أي تتبع آخر هنا
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
