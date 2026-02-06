@@ -1,1 +1,118 @@
-<button class="back-btn" onclick="window.location.href='index1.html'"> open in toolsHUb</button>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>W10</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 30px;
+            background: linear-gradient(90deg, #ff9a9e, #fad0c4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .back-btn {
+            background: linear-gradient(90deg, #ff6b6b, #ffa726);
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: all 0.3s;
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+        
+        .back-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(255, 107, 107, 0.5);
+        }
+        
+        .info-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px auto;
+            max-width: 800px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .feature {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border-left: 5px solid #ff6b6b;
+            text-align: right;
+        }
+        
+        .feature h3 {
+            color: #ffd93d;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #6a5af9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">
+            <i class="fas fa-tools"></i>
+        </div>
+        
+        <h1>مرحباً في W10</h1>
+        
+        <div class="info-box">
+            <p>هذه صفحة W10 المصممة للاندماج مع أدوات متعددة</p>
+            <p>انقر على الزر أدناه للعودة إلى القائمة الرئيسية</p>
+        </div>
+        
+        <button class="back-btn" onclick="window.location.href='index1.html'">
+            <i class="fas fa-external-link-alt"></i> افتح في Tools Hub
+        </button>
+        
+        <div class="features">
+            <div class="feature">
+                <h3>ميزات W10</h3>
+                <p>• تصميم متجاوب مع جميع الأجهزة</p>
+                <p>• واجهة مستخدم عربية سلسة</p>
+                <p>• تكامل مع أدوات متعددة</p>
+                <p>• أداء سريع وفعال</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
